@@ -7,6 +7,7 @@ enum PackageType {
     EMPTY = 0,
     USER_Regist,
     USER_Login,
+    USER_Login_IsSameName,
     USER_Talking,
     USER_TalkingAll,
 };

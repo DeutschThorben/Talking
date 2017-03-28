@@ -20,6 +20,8 @@ public:
     void onNewUserRegist(QString name, QString keyword);
     // user login
     void onUserLogin(QString name, QString keyword);
+    // userName whether is same
+    void onWhetherIsSame(QString name);
     // user is talking with other user
     void onTalkingWithOther(QString name, QString otherUser, QString talkInformation);
 

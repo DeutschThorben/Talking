@@ -14,9 +14,19 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        client.cpp
+        client.cpp \
+    screen/talking.cpp \
+    screen/resign.cpp \
+    model/clientcommon.cpp
 
 HEADERS  += client.h \
-    model/package.h
+    model/package.h \
+    screen/talking.h \
+    screen/resign.h \
+    model/clientcommon.h
 
-FORMS    += client.ui
+FORMS    += client.ui \
+    screen/talking.ui \
+    screen/resign.ui
+
+DISTFILES +=

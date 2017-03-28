@@ -19,7 +19,7 @@ public:
     bool onIsRegisterUser(UserInformation *user);
     void onRemoveUser(UserInformation *user);
 
-    QString getUserNameFromServer();
+//    QString getUserNameFromServer();
     int getUserStateFromServer();
 
 signals:

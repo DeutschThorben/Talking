@@ -103,10 +103,10 @@ void UserList::onRemoveUser(UserInformation *user)
     // onRemoveUser   <-Introduction
 }
 
-QString UserList::getUserNameFromServer()
-{
-    ControlSqlite::getInstance()->onCreateConnect();
-    QSqlQuery query;
+//QString UserList::getUserNameFromServer()
+//{
+//    ControlSqlite::getInstance()->onCreateConnect();
+//    QSqlQuery query;
 
-    query.prepare()
-}
+//    query.prepare()
+//}

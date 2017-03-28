@@ -19,6 +19,7 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTextBrowser>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -33,6 +34,7 @@ public:
     QVBoxLayout *verticalLayout;
     QLabel *m_labelUser;
     QTextBrowser *m_userList;
+    QTextEdit *textEdit_work;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -62,6 +64,9 @@ public:
 
         verticalLayout->addWidget(m_userList);
 
+        textEdit_work = new QTextEdit(centralWidget);
+        textEdit_work->setObjectName(QStringLiteral("textEdit_work"));
+        textEdit_work->setGeometry(QRect(280, 70, 231, 361));
         Server->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(Server);
         menuBar->setObjectName(QStringLiteral("menuBar"));

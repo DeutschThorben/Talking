@@ -10,8 +10,8 @@ Server::Server(QWidget *parent) :
     m_server = new QTcpServer();
 
     if (!m_server->isListening()) {
-        QString count_ip = "192.168.1.10";
-        m_server->listen(QHostAddress::Any, count_ip.toInt());
+        m_server->listen(QHostAddress::Any, 1024);
+        ui->textEdit_work->setText("Server is working start");
     }
     else {
         return;
@@ -38,4 +38,5 @@ void Server::onConnection()
     new_client->moveToThread(thread);
     thread->start();
 
+    ui->textEdit_work->setText("A client is connected");
 }
