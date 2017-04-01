@@ -26,13 +26,17 @@ public:
     void onTalkingWithOther(QString name, QString otherUser, QString talkInformation);
 
 signals:
+    void UserStateChange(QString, QString);
 
 public slots:
     void onReadyRead();
 
 private:
     Package onReadPackage();
-    void onWritePackage(PackageType head = EMPTY, QString name = "", QString talkingInformation = "", int result = 0);
+    void onWritePackage(PackageType head = EMPTY, QString name = "", QString otherUser = "", QString talkingInformation = "", int result = 0);
+
+    const char* onQStringChangeToChar(QString b_text);
+    QString onCharToQString(const char *b_text);
 
     QTcpSocket *m_socket;
     UserList  *m_userList;

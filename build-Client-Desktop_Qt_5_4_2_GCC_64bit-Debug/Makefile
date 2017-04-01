@@ -52,7 +52,8 @@ SOURCES       = ../Client/main.cpp \
 		../Client/client.cpp \
 		../Client/screen/talking.cpp \
 		../Client/screen/resign.cpp \
-		../Client/model/clientcommon.cpp moc_client.cpp \
+		../Client/model/clientcommon.cpp qrc_picture.cpp \
+		moc_client.cpp \
 		moc_talking.cpp \
 		moc_resign.cpp \
 		moc_clientcommon.cpp
@@ -61,6 +62,7 @@ OBJECTS       = main.o \
 		talking.o \
 		resign.o \
 		clientcommon.o \
+		qrc_picture.o \
 		moc_client.o \
 		moc_talking.o \
 		moc_resign.o \
@@ -343,6 +345,7 @@ Makefile: ../Client/Client.pro ../../Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++/qmake.
 		../../Qt5.4.2/5.4/gcc_64/mkspecs/features/yacc.prf \
 		../../Qt5.4.2/5.4/gcc_64/mkspecs/features/lex.prf \
 		../Client/Client.pro \
+		../Client/picture.qrc \
 		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Widgets.prl \
 		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Gui.prl \
 		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Core.prl \
@@ -468,6 +471,7 @@ Makefile: ../Client/Client.pro ../../Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++/qmake.
 ../../Qt5.4.2/5.4/gcc_64/mkspecs/features/yacc.prf:
 ../../Qt5.4.2/5.4/gcc_64/mkspecs/features/lex.prf:
 ../Client/Client.pro:
+../Client/picture.qrc:
 /home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Widgets.prl:
 /home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Gui.prl:
 /home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Core.prl:
@@ -486,6 +490,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
+	$(COPY_FILE) --parents ../Client/picture.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../Client/client.h ../Client/model/package.h ../Client/screen/talking.h ../Client/screen/resign.h ../Client/model/clientcommon.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../Client/main.cpp ../Client/client.cpp ../Client/screen/talking.cpp ../Client/screen/resign.cpp ../Client/model/clientcommon.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../Client/client.ui ../Client/screen/talking.ui ../Client/screen/resign.ui $(DISTDIR)/
@@ -509,8 +514,14 @@ mocables: compiler_moc_header_make_all compiler_moc_source_make_all
 
 check: first
 
-compiler_rcc_make_all:
+compiler_rcc_make_all: qrc_picture.cpp
 compiler_rcc_clean:
+	-$(DEL_FILE) qrc_picture.cpp
+qrc_picture.cpp: ../Client/picture.qrc \
+		../Client/true.png \
+		../Client/failure.png
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/rcc -name picture ../Client/picture.qrc -o qrc_picture.cpp
+
 compiler_moc_header_make_all: moc_client.cpp moc_talking.cpp moc_resign.cpp moc_clientcommon.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_client.cpp moc_talking.cpp moc_resign.cpp moc_clientcommon.cpp
@@ -633,6 +644,13 @@ moc_client.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
 		../Client/screen/talking.h \
 		../Client/client.h
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/client.h -o moc_client.cpp
@@ -854,6 +872,13 @@ moc_resign.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
 		../Client/model/clientcommon.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
 		../Client/screen/resign.h
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/screen/resign.h -o moc_resign.cpp
 
@@ -952,7 +977,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_header_clean compiler_uic_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
 
@@ -1076,6 +1101,13 @@ main.o: ../Client/main.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
 		../Client/screen/talking.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QApplication \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qapplication.h \
@@ -1206,6 +1238,13 @@ client.o: ../Client/client.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
 		../Client/screen/talking.h \
 		ui_client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
@@ -1225,7 +1264,6 @@ client.o: ../Client/client.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qheaderview.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
@@ -1238,12 +1276,6 @@ client.o: ../Client/client.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMenuBar \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmenubar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmenu.h \
@@ -1507,6 +1539,13 @@ resign.o: ../Client/screen/resign.cpp ../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
 		../Client/model/clientcommon.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
 		ui_resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QAction \
@@ -1522,11 +1561,15 @@ resign.o: ../Client/screen/resign.cpp ../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qinputmethod.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QButtonGroup \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qbuttongroup.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QHBoxLayout \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qboxlayout.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlayout.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlayoutitem.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qgridlayout.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QHeaderView \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qheaderview.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
@@ -1540,15 +1583,13 @@ resign.o: ../Client/screen/resign.cpp ../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLabel \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlabel.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QPushButton \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qpushbutton.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractbutton.h
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QSpacerItem \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QVBoxLayout
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o resign.o ../Client/screen/resign.cpp
 
 clientcommon.o: ../Client/model/clientcommon.cpp ../Client/model/clientcommon.h \
@@ -1625,6 +1666,9 @@ clientcommon.o: ../Client/model/clientcommon.cpp ../Client/model/clientcommon.h 
 		../Client/model/package.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o clientcommon.o ../Client/model/clientcommon.cpp
+
+qrc_picture.o: qrc_picture.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_picture.o qrc_picture.cpp
 
 moc_client.o: moc_client.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_client.o moc_client.cpp

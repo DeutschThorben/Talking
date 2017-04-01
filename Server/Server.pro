@@ -31,3 +31,6 @@ HEADERS  += server.h \
     model/controlsqlite.h
 
 FORMS    += server.ui
+
+RESOURCES += \
+    picture.qrc

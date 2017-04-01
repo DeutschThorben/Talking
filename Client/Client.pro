@@ -30,3 +30,6 @@ FORMS    += client.ui \
     screen/resign.ui
 
 DISTFILES +=
+
+RESOURCES += \
+    picture.qrc

@@ -44,6 +44,7 @@ void Client::onBtnLoginClicked()
     m_socked->connectToHost(m_IP.toStdString().c_str(), 1024);
 
     m_clientCommon->onWritePackage(USER_Login, m_name, m_keyword);
+
     // onBtnLoginClicked   <-Introduction
 }
 
@@ -55,7 +56,7 @@ void Client::onBtnLoginClicked()
 void Client::onBtnRegistClicked()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-    Resign *m_resign = new Resign(m_socked);
+    Resign *m_resign = new Resign();
     m_resign->show();
     // onBtnRegistClicked   <-Introduction
 }
@@ -80,7 +81,7 @@ void Client::onReadFromServer()
             screen_talking->show();
             close();
         }
-        else if(0 == bag.head) {
+        else if(0 == bag.result) {
             QMessageBox::warning(NULL, "warnning", "Login failure");
         }
         else {

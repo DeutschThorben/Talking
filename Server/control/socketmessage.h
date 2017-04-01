@@ -2,6 +2,8 @@
 #define SOCKETMESSAGE_H
 
 #include <QObject>
+#include <QMap>
+#include <iostream>
 #include <QtNetwork/QTcpSocket>
 // #include "control/socketclient.h"
 

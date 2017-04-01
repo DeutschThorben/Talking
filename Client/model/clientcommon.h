@@ -14,12 +14,16 @@ public:
     Package onReadPackage();
     void onWritePackage(PackageType head = EMPTY, QString name = "", QString keyword = "", QString otherUser = "", QString talkingInformation = "");
 
+    const char* onQStringChangeToChar(QString b_text);
+    QString onCharToQString(char *b_text);
+
 signals:
 
 public slots:
 
 private:
     QTcpSocket *m_socked;
+
 };
 
 #endif // CLIENTCOMMON_H

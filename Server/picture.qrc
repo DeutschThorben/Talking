@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>other/online.png</file>
+        <file>other/offline.png</file>
+    </qresource>
+</RCC>

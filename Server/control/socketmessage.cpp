@@ -42,5 +42,7 @@ bool SocketMessage::isUserOnline(QString name)
 QTcpSocket* SocketMessage::onFindSockedByName(QString name)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
+    QTcpSocket *tmp = map_onlineUser.value(name);
+    qDebug("[%s] tmp is [%d]", __PRETTY_FUNCTION__, tmp);
     return map_onlineUser.value(name);
 }

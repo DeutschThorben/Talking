@@ -17,15 +17,18 @@ class Resign : public QWidget
     Q_OBJECT
 
 public:
-    explicit Resign(QTcpSocket *sockfd, QWidget *parent = 0);
+    explicit Resign(QWidget *parent = 0);
     ~Resign();
-
-    QTcpSocket *m_socked;
 
 private slots:
     void onBtnOkClicked();
     void onBtnEmptyClicked();
     void onFeedBackRegist();
+
+    // Edit label change
+    void onLabelNameChange();
+    void onLabelKWChange();
+    void onLabelKWAgainChange();
 
 //    void onIsSameName();
 
@@ -34,9 +37,12 @@ signals:
 
 private:
     Ui::Resign *ui;
-
+    QTcpSocket *m_socked;
 
     ClientCommon *m_clientCommon;
+    void onLabelNameResult(int result);
+    bool onBtnOKEnable();
+
 };
 
 #endif // RESIGN_H

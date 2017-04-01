@@ -54,7 +54,8 @@ SOURCES       = ../Server/main.cpp \
 		../Server/control/socketclient.cpp \
 		../Server/model/userlist.cpp \
 		../Server/model/userinformation.cpp \
-		../Server/model/controlsqlite.cpp moc_server.cpp \
+		../Server/model/controlsqlite.cpp qrc_picture.cpp \
+		moc_server.cpp \
 		moc_socketmessage.cpp \
 		moc_socketclient.cpp \
 		moc_userlist.cpp \
@@ -67,6 +68,7 @@ OBJECTS       = main.o \
 		userlist.o \
 		userinformation.o \
 		controlsqlite.o \
+		qrc_picture.o \
 		moc_server.o \
 		moc_socketmessage.o \
 		moc_socketclient.o \
@@ -355,6 +357,7 @@ Makefile: ../Server/Server.pro ../../Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++/qmake.
 		../../Qt5.4.2/5.4/gcc_64/mkspecs/features/yacc.prf \
 		../../Qt5.4.2/5.4/gcc_64/mkspecs/features/lex.prf \
 		../Server/Server.pro \
+		../Server/picture.qrc \
 		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Widgets.prl \
 		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Gui.prl \
 		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Core.prl \
@@ -481,6 +484,7 @@ Makefile: ../Server/Server.pro ../../Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++/qmake.
 ../../Qt5.4.2/5.4/gcc_64/mkspecs/features/yacc.prf:
 ../../Qt5.4.2/5.4/gcc_64/mkspecs/features/lex.prf:
 ../Server/Server.pro:
+../Server/picture.qrc:
 /home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Widgets.prl:
 /home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Gui.prl:
 /home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Core.prl:
@@ -500,6 +504,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
+	$(COPY_FILE) --parents ../Server/picture.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../Server/server.h ../Server/control/socketmessage.h ../Server/control/socketclient.h ../Server/control/package.h ../Server/model/userlist.h ../Server/model/userinformation.h ../Server/model/controlsqlite.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../Server/main.cpp ../Server/server.cpp ../Server/control/socketmessage.cpp ../Server/control/socketclient.cpp ../Server/model/userlist.cpp ../Server/model/userinformation.cpp ../Server/model/controlsqlite.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../Server/server.ui $(DISTDIR)/
@@ -523,8 +528,14 @@ mocables: compiler_moc_header_make_all compiler_moc_source_make_all
 
 check: first
 
-compiler_rcc_make_all:
+compiler_rcc_make_all: qrc_picture.cpp
 compiler_rcc_clean:
+	-$(DEL_FILE) qrc_picture.cpp
+qrc_picture.cpp: ../Server/picture.qrc \
+		../Server/other/online.png \
+		../Server/other/offline.png
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/rcc -name picture ../Server/picture.qrc -o qrc_picture.cpp
+
 compiler_moc_header_make_all: moc_server.cpp moc_socketmessage.cpp moc_socketclient.cpp moc_userlist.cpp moc_userinformation.cpp moc_controlsqlite.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_server.cpp moc_socketmessage.cpp moc_socketclient.cpp moc_userlist.cpp moc_userinformation.cpp moc_controlsqlite.cpp
@@ -633,6 +644,24 @@ moc_server.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qicon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpServer \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpserver.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -653,8 +682,12 @@ moc_server.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlRecord \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlrecord.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
 		../Server/model/userinformation.h \
 		../Server/model/controlsqlite.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QDebug \
 		../Server/server.h
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Server -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Server/server.h -o moc_server.cpp
 
@@ -708,7 +741,6 @@ moc_socketmessage.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
-		../Server/control/socketclient.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -729,17 +761,6 @@ moc_socketmessage.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
-		../Server/control/package.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
-		../Server/control/socketmessage.h \
-		../Server/model/userlist.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
-		../Server/model/userinformation.h \
-		../Server/model/controlsqlite.h \
 		../Server/control/socketmessage.h
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Server -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Server/control/socketmessage.h -o moc_socketmessage.cpp
 
@@ -816,15 +837,18 @@ moc_socketclient.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../Server/control/package.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
 		../Server/control/socketmessage.h \
-		../Server/control/socketclient.h \
 		../Server/model/userlist.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlRecord \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlrecord.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
 		../Server/model/userinformation.h \
 		../Server/model/controlsqlite.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QDebug \
 		../Server/control/socketclient.h
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Server -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Server/control/socketclient.h -o moc_socketclient.cpp
 
@@ -883,8 +907,29 @@ moc_userlist.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlRecord \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlrecord.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvariant.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpair.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdebug.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qhash.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlocale.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvector.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregexp.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringmatcher.h \
 		../Server/model/userinformation.h \
 		../Server/model/controlsqlite.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QDebug \
 		../Server/model/userlist.h
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Server -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Server/model/userlist.h -o moc_userlist.cpp
 
@@ -1011,7 +1056,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_header_clean compiler_uic_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
 
@@ -1121,6 +1166,24 @@ main.o: ../Server/main.cpp ../Server/server.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qicon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpServer \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpserver.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -1141,8 +1204,12 @@ main.o: ../Server/main.cpp ../Server/server.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlRecord \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlrecord.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
 		../Server/model/userinformation.h \
 		../Server/model/controlsqlite.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QDebug \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QApplication \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qapplication.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreapplication.h \
@@ -1258,6 +1325,24 @@ server.o: ../Server/server.cpp ../Server/server.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qicon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpServer \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpserver.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -1278,10 +1363,13 @@ server.o: ../Server/server.cpp ../Server/server.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlRecord \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlrecord.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
 		../Server/model/userinformation.h \
 		../Server/model/controlsqlite.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QDebug \
 		ui_server.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QAction \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qaction.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qactiongroup.h \
@@ -1296,29 +1384,27 @@ server.o: ../Server/server.cpp ../Server/server.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qbuttongroup.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QHeaderView \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qheaderview.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLabel \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlabel.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMenuBar \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmenubar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmenu.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QStatusBar \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstatusbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QTextEdit \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtextedit.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextdocument.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QToolBar \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtoolbar.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QColor \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QColorDialog \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qcolordialog.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o server.o ../Server/server.cpp
 
 socketmessage.o: ../Server/control/socketmessage.cpp ../Server/control/socketmessage.h \
@@ -1372,7 +1458,6 @@ socketmessage.o: ../Server/control/socketmessage.cpp ../Server/control/socketmes
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
-		../Server/control/socketclient.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -1392,17 +1477,7 @@ socketmessage.o: ../Server/control/socketmessage.cpp ../Server/control/socketmes
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvector.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
-		../Server/control/package.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
-		../Server/model/userlist.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
-		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
-		../Server/model/userinformation.h \
-		../Server/model/controlsqlite.h
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o socketmessage.o ../Server/control/socketmessage.cpp
 
 socketclient.o: ../Server/control/socketclient.cpp ../Server/control/socketclient.h \
@@ -1485,8 +1560,12 @@ socketclient.o: ../Server/control/socketclient.cpp ../Server/control/socketclien
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlRecord \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlrecord.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
 		../Server/model/userinformation.h \
-		../Server/model/controlsqlite.h
+		../Server/model/controlsqlite.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o socketclient.o ../Server/control/socketclient.cpp
 
 userlist.o: ../Server/model/userlist.cpp ../Server/model/userlist.h \
@@ -1545,8 +1624,29 @@ userlist.o: ../Server/model/userlist.cpp ../Server/model/userlist.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlRecord \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlrecord.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvariant.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpair.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdebug.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qhash.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlocale.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvector.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregexp.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringmatcher.h \
 		../Server/model/userinformation.h \
-		../Server/model/controlsqlite.h
+		../Server/model/controlsqlite.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o userlist.o ../Server/model/userlist.cpp
 
 userinformation.o: ../Server/model/userinformation.cpp ../Server/model/userinformation.h \
@@ -1657,6 +1757,9 @@ controlsqlite.o: ../Server/model/controlsqlite.cpp ../Server/model/controlsqlite
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o controlsqlite.o ../Server/model/controlsqlite.cpp
+
+qrc_picture.o: qrc_picture.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_picture.o qrc_picture.cpp
 
 moc_server.o: moc_server.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_server.o moc_server.cpp
