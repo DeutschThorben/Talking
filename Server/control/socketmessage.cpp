@@ -20,11 +20,11 @@ SocketMessage* SocketMessage::getInstance()
  *  Introduction: push online user into vector (not always maybe registered)
  *  ReturnValue: nothing
  */
-//void SocketMessage::onClientRegist(SocketClient *client)
-//{
-//    vector_clients.push_back(client);
-//    // onClientRegist   <-Introduction
-//}
+void SocketMessage::onClientRegist(SocketClient *client)
+{
+    vector_clients.push_back(client);
+    // onClientRegist   <-Introduction
+}
 
 bool SocketMessage::isUserOnline(QString name)
 {

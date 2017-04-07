@@ -10,7 +10,7 @@
 #include "model/clientcommon.h"
 
 #include "screen/resign.h"
-#include "screen/talking.h"
+#include "screen/talkinglistscreen.h"
 
 namespace Ui {
 class Client;
@@ -38,6 +38,8 @@ private:
     // Resign *m_resign;
     QTcpSocket *m_socked;
     ClientCommon *m_clientCommon;
+    QString m_name;
+    TalkingListScreen *screen_talkingList;
 };
 
 #endif // CLIENT_H

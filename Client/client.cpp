@@ -9,9 +9,9 @@ Client::Client(QWidget *parent) :
     ui->setupUi(this);
     m_socked = new QTcpSocket();
    //  m_resign = new Resign(m_socked);
-    m_clientCommon = new ClientCommon(m_socked);
+    m_clientCommon = ClientCommon::getInstance();
 
-    qDebug("[%s]", __PRETTY_FUNCTION__);
+    qDebug("[%s]  socket is [%p]", __PRETTY_FUNCTION__, m_socked);
     connect(m_socked, SIGNAL(readyRead()), this, SLOT(onReadFromServer()));
     connect(ui->btn_regist, SIGNAL(clicked()), this, SLOT(onBtnRegistClicked()));
     connect(ui->btn_login, SIGNAL(clicked()), this, SLOT(onBtnLoginClicked()));
@@ -21,10 +21,12 @@ Client::Client(QWidget *parent) :
 Client::~Client()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-    disconnect(m_socked, SIGNAL(readyRead()), this, SLOT(onReadFromServer()));
+
     disconnect(ui->btn_regist, SIGNAL(clicked(bool)), this, SLOT(onBtnRegistClicked()));
     disconnect(ui->btn_login, SIGNAL(clicked()), this, SLOT(onBtnLoginClicked()));
     disconnect(ui->btn_exit, SIGNAL(clicked()), this, SLOT(onBtnExitClicked()));
+
+    delete m_clientCommon;
     delete ui;
 }
 
@@ -36,13 +38,13 @@ Client::~Client()
 void Client::onBtnLoginClicked()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-    QString m_name = ui->lineEdit_name->text();
+    m_name = ui->lineEdit_name->text();
     QString m_keyword = ui->lineEdit_keyword->text();
 
     // make connect with server
     QString m_IP = "127.0.0.1";
     m_socked->connectToHost(m_IP.toStdString().c_str(), 1024);
-
+    m_clientCommon->setSocket(m_socked);
     m_clientCommon->onWritePackage(USER_Login, m_name, m_keyword);
 
     // onBtnLoginClicked   <-Introduction
@@ -77,8 +79,9 @@ void Client::onReadFromServer()
     qDebug("[%s]", __PRETTY_FUNCTION__);
     if (USER_Login == bag.head) {
         if (1 == bag.result) {
-            Talking *screen_talking = new Talking();
-            screen_talking->show();
+            disconnect(m_socked, SIGNAL(readyRead()), this, SLOT(onReadFromServer()));
+            screen_talkingList = new TalkingListScreen(m_socked, m_name);
+            screen_talkingList->show();
             close();
         }
         else if(0 == bag.result) {

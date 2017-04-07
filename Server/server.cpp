@@ -33,6 +33,7 @@ Server::~Server()
 {
     disconnect(m_server, SIGNAL(newConnection()), this, SLOT(onConnection()));
     disconnect(new_client, SIGNAL(UserStateChange(QString, QString)), this, SLOT(onFreshUserList(QString, QString)));
+    disconnect(new_client, SIGNAL(UserExit(QString)), this, SLOT(onUserExit(QString)));
 
     disconnect(ui->btn_delete, SIGNAL(clicked()), this, SLOT(onBtnDeleteClicked()));
     disconnect(ui->btn_exit, SIGNAL(clicked()), this, SLOT(onBtnExitClicked()));
@@ -45,9 +46,11 @@ void Server::onConnection()
 {
     QTcpSocket *socked = m_server->nextPendingConnection();
     new_client = new SocketClient(socked);
-    // SocketMessage *message = SocketMessage::getInstance();
-    // message->onClientRegist(new_client);
+    qDebug("[%s]  socket is [%p]", __PRETTY_FUNCTION__, socked);
+    SocketMessage *message = SocketMessage::getInstance();
+    message->onClientRegist(new_client);
     connect(new_client, SIGNAL(UserStateChange(QString, QString)), this, SLOT(onFreshUserList(QString, QString)));
+    connect(new_client, SIGNAL(UserExit(QString)), this, SLOT(onUserExit(QString)));
 
     // move new client to one thread
     QThread *thread = new QThread();
@@ -70,28 +73,28 @@ void Server::onShowAllUser()
 
     // push all user in server list from table
     for (int ID = 1; ID <= table_maxID; ID++) {
-        a_state = m_userList->onSelectSomeState(ID);
         a_name = m_userList->onSelectSomeName(ID);
 
         if ("" != a_name) {
+            a_state = m_userList->onSelectSomeState(ID);
+            qDebug("[%s], name is [%s] state is [%d]", __PRETTY_FUNCTION__,a_name.toStdString().c_str(), a_state);
             QListWidgetItem *m_qlistItem = new QListWidgetItem(onChangeState(a_state), QObject::tr(a_name.toStdString().c_str()));
             ui->list_user->addItem(m_qlistItem);
-            qDebug("[%s] name [%d] is [%s]", __PRETTY_FUNCTION__, ID, a_name.toStdString().c_str());
         }
     }
-//    ui->list_user->sortItems();
     // onShowAllUser   <-Introduction
 }
 
 QIcon Server::onChangeState(int m_state)
 {
+    qDebug("[%s], state is [%d]", __PRETTY_FUNCTION__, m_state);
     QIcon m_icon;
     switch (m_state) {
     case 1:
-        m_icon = QIcon(QObject::tr("other/online.png"));
+        m_icon = QIcon(QObject::tr(":/new/prefix1/other/online.png"));
         break;
     case 0:
-        m_icon = QIcon(QObject::tr("other/offline.png"));
+        m_icon = QIcon(QObject::tr(":/new/prefix1/other/offline.png"));
     default:
         break;
     }
@@ -135,13 +138,22 @@ void Server::onFreshUserList(QString state, QString name)
     onShowAllUser();
 
     QString show_text = "";
-
     if ("Regist" == state) {
         show_text = show_text + "User: " + name + " is resgis already";
     }
     else if ("Login" == state) {
         show_text = show_text + "User: " + name + " is login already";
     }
+    else if ("Exit" == state) {
+        show_text = show_text + "User:" + name + " has exit";
+    }
     ui->list_work->addItem(new QListWidgetItem(QObject::tr(show_text.toStdString().c_str())));
     // onFreshUserList   <-Introduction
+}
+
+void Server::onUserExit(QString m_name)
+{
+    m_userList->onRemoveUser(m_name);
+
+    onFreshUserList("Exit", m_name);
 }

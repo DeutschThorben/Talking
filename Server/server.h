@@ -38,6 +38,7 @@ public slots:
     void onFreshUserList(QString state, QString name);
 
     void onGetListText(QString list_text);
+    void onUserExit(QString);
 
 private:
     Ui::Server *ui;
@@ -49,6 +50,7 @@ private:
 
     void onShowAllUser();
     QIcon onChangeState(int m_state);
+
 };
 
 #endif // SERVER_H

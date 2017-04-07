@@ -3,11 +3,11 @@
 
 #include <QWidget>
 #include <QMessageBox>
-#include <QtNetwork/QTcpSocket>
+#include <QLineEdit>
 
 #include "model/package.h"
 #include "model/clientcommon.h"
-#include <QLineEdit>
+
 namespace Ui {
 class Resign;
 }
@@ -19,6 +19,7 @@ class Resign : public QWidget
 public:
     explicit Resign(QWidget *parent = 0);
     ~Resign();
+    virtual void closeEvent();
 
 private slots:
     void onBtnOkClicked();
@@ -30,18 +31,18 @@ private slots:
     void onLabelKWChange();
     void onLabelKWAgainChange();
 
-//    void onIsSameName();
+
 
 signals:
-//    void isSameName();
 
 private:
     Ui::Resign *ui;
     QTcpSocket *m_socked;
 
     ClientCommon *m_clientCommon;
+
+    int m_result;
     void onLabelNameResult(int result);
-    bool onBtnOKEnable();
 
 };
 

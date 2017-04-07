@@ -19,7 +19,7 @@ public:
     bool onAddUser(UserInformation *user);
     bool onLoginUser(QString name, QString keyword);
     bool onIsRegisterUser(UserInformation *user);
-    void onRemoveUser(UserInformation *user);
+    void onRemoveUser(QString name);
     void onDeleteUser(QString name);
 
     QString onSelectSomeName(int m_ID);

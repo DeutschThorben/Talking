@@ -7,12 +7,14 @@ Resign::Resign(QWidget *parent) :
 {
     ui->setupUi(this);
     m_socked = new QTcpSocket();
-    m_clientCommon = new ClientCommon(m_socked);
+    m_clientCommon = ClientCommon::getInstance();
+    m_clientCommon->setSocket(m_socked);
+
+    setAttribute(Qt::WA_DeleteOnClose);
 
     QString m_IP = "127.0.0.1";
     m_socked->connectToHost(m_IP.toStdString().c_str(), 1024);
 
-//    connect(this, SIGNAL(isSameName()), this, SLOT(onIsSameName()));
     connect(m_socked, SIGNAL(readyRead()), this, SLOT(onFeedBackRegist()));
     connect(ui->btn_ok, SIGNAL(clicked()), this, SLOT(onBtnOkClicked()));
     connect(ui->btn_empty, SIGNAL(clicked()), this, SLOT(onBtnEmptyClicked()));
@@ -25,7 +27,6 @@ Resign::Resign(QWidget *parent) :
 Resign::~Resign()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-//    disconnect(this, SIGNAL(isSameName()), this, SLOT(onIsSameName()));
     disconnect (ui->btn_ok, SIGNAL(clicked()), this, SLOT(onBtnOkClicked()));
     disconnect(ui->btn_empty, SIGNAL(clicked()), this, SLOT(onBtnEmptyClicked()));
     disconnect(m_socked, SIGNAL(readyRead()), this, SLOT(onFeedBackRegist()));
@@ -33,6 +34,7 @@ Resign::~Resign()
     disconnect(ui->user_newName, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(onLabelNameChange()));
     disconnect(ui->user_newKeyword, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(onLabelKWChange()));
     disconnect(ui->user_keywordAgain, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(onLabelKWAgainChange()));
+
     delete m_socked;
     delete m_clientCommon;
     delete ui;
@@ -50,14 +52,17 @@ void Resign::onBtnOkClicked()
     QString m_keyword = ui->user_newKeyword->text();
     QString m_keywordAgain = ui->user_keywordAgain->text();
 
-    if (m_keyword != m_keywordAgain) {
-        QMessageBox::critical(NULL, "Error", "Each keyword is not same", QMessageBox::Ok);
+    if (1 == m_result) {
+        QMessageBox::critical(NULL, "Error", "This name is registed already", QMessageBox::Ok);
     }
     else {
-        qDebug("[%s] take the bag to server", __PRETTY_FUNCTION__);
-        // make connect with server
-
-        m_clientCommon->onWritePackage(USER_Regist, m_name, m_keyword);
+        if (m_keyword != m_keywordAgain) {
+            QMessageBox::critical(NULL, "Error", "Each keyword is not same", QMessageBox::Ok);
+        }
+        else {
+            qDebug("[%s] take the bag to server", __PRETTY_FUNCTION__);
+            m_clientCommon->onWritePackage(USER_Regist, m_name, m_keyword);
+        }
     }
     // onBtnOkClicked   <-onBtnEmptyClicked
 }
@@ -73,13 +78,17 @@ void Resign::onBtnEmptyClicked()
     ui->user_newName->setText("");
     ui->user_newKeyword->setText("");
     ui->user_keywordAgain->setText("");
+
+    ui->label_iconName->setText("");
+    ui->label_iconKW->setText("");
+    ui->label_iconKWA->setText("");
     // onBtnLoginClicked   <-onBtnEmptyClicked
 }
 
 /*
  *  onFeedBackRegist
  *  Instruction: Clean all text in regist screen
- *  ReturnValue: regist success (1), regist failure (0), regist name is same (2)
+ *  ReturnValue: regist success (1), regist failure (0)
  */
 void Resign::onFeedBackRegist()
 {
@@ -91,12 +100,10 @@ void Resign::onFeedBackRegist()
     qDebug("[%s] head is [%d]", __PRETTY_FUNCTION__, bag.head);
     qDebug("[%s] result is [%d]", __PRETTY_FUNCTION__, bag.result);
     if (USER_Regist == bag.head) {
-        if (2 == bag.result) {
-            QMessageBox::warning(NULL, "Warning", "This name is registed already", QMessageBox::Ok);
-        }
-        else if(1 == bag.result) {
+        if(1 == bag.result) {
             QMessageBox message(QMessageBox::NoIcon, "Message", "Regist success", QMessageBox::Ok);
-            if (message.exec() == QMessageBox::Ok) {
+            if (QMessageBox::Ok == message.exec()) {
+                m_clientCommon->createFriendList(ui->user_newName->text());
                 close();
             }
         }
@@ -110,25 +117,38 @@ void Resign::onFeedBackRegist()
     // onFeedBackRegist   <-onBtnEmptyClicked
 }
 
+/*
+ *  onLabelNameResult
+ *  Instruction: Feedback from server about whether the name has been used
+ *  ReturnValue: name has been used (1), name is new (0)
+ */
 void Resign::onLabelNameResult(int result)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
+    qDebug("[%s] the result is [%d]", __PRETTY_FUNCTION__, result);
+    m_result = result;
     if (1 == result) {
         ui->label_name->setText("This name has been used");
         QPixmap img(":/new/prefix1/failure.png");
         QPixmap fitPixmap = img.scaled(ui->label_iconName->width(), ui->label_iconName->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->label_iconName->setPixmap(QPixmap(fitPixmap));
         ui->label_name->setVisible(true);
+        ui->btn_ok->setEnabled(false);
     }
     else if (0 == result) {
         QPixmap img(":/new/prefix1/true.png");
         QPixmap fitPixmap = img.scaled(ui->label_iconName->width(), ui->label_iconName->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->label_iconName->setPixmap(QPixmap(fitPixmap));
         ui->label_name->setText("");
+        ui->btn_ok->setEnabled(true);
     }
     // onLabelNameResult   <-onBtnEmptyClicked
 }
 
+/*
+ *  onLabelNameChange
+ *  Instruction: warning the name can't empty
+ *  ReturnValue: nothing
+ */
 void Resign::onLabelNameChange()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
@@ -140,13 +160,20 @@ void Resign::onLabelNameChange()
         QPixmap fitPixmap = img.scaled(ui->label_iconName->width(), ui->label_iconName->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->label_iconName->setPixmap(QPixmap(fitPixmap));
         ui->label_name->setVisible(true);
+        ui->btn_ok->setEnabled(false);
     }
     else {
+        ui->btn_ok->setEnabled(true);
         m_clientCommon->onWritePackage(USER_Regist_IsSameName, m_name);
     }
     // onLabelKWChange   <-onBtnEmptyClicked
 }
 
+/*
+ *  onLabelKWChange
+ *  Instruction: warning the keyword must has six charater
+ *  ReturnValue: nothing
+ */
 void Resign::onLabelKWChange()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
@@ -157,23 +184,31 @@ void Resign::onLabelKWChange()
         QPixmap img(":/new/prefix1/failure.png");
         QPixmap fitPixmap = img.scaled(ui->label_iconKW->width(), ui->label_iconKW->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->label_iconKW->setPixmap(QPixmap(fitPixmap));
+        ui->btn_ok->setEnabled(false);
     }
     else if (m_KW.length() == 6) {
         ui->label_keyword->setText("");
         QPixmap img(":/new/prefix1/true.png");
         QPixmap fitPixmap = img.scaled(ui->label_iconKW->width(), ui->label_iconKW->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->label_iconKW->setPixmap(QPixmap(fitPixmap));
+        ui->btn_ok->setEnabled(true);
     }
     else if (m_KW.length() == 0) {
         ui->label_keyword->setText("Keyword can't is empty");
         QPixmap img(":/new/prefix1/failure.png");
         QPixmap fitPixmap = img.scaled(ui->label_iconKW->width(), ui->label_iconKW->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->label_iconKW->setPixmap(QPixmap(fitPixmap));
+        ui->btn_ok->setEnabled(false);
     }
     onLabelKWAgainChange();
     // onLabelKWChange   <-onBtnEmptyClicked
 }
 
+/*
+ *  onLabelKWAgainChange
+ *  Instruction: warning the KWAgain is same as keyword
+ *  ReturnValue: nothing
+ */
 void Resign::onLabelKWAgainChange()
 {
     QString m_KW = ui->user_newKeyword->text();
@@ -191,23 +226,20 @@ void Resign::onLabelKWAgainChange()
             QPixmap img(":/new/prefix1/true.png");
             QPixmap fitPixmap = img.scaled(ui->label_iconKWA->width(), ui->label_iconKWA->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             ui->label_iconKWA->setPixmap(QPixmap(fitPixmap));
+            ui->btn_ok->setEnabled(true);
         }
         else {
             ui->label_keywordAgain->setText("Twice keyword is not same");
             QPixmap img(":/new/prefix1/failure.png");
             QPixmap fitPixmap = img.scaled(ui->label_iconKWA->width(), ui->label_iconKWA->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             ui->label_iconKWA->setPixmap(QPixmap(fitPixmap));
+            ui->btn_ok->setEnabled(false);
         }
     }
 }
 
-bool Resign::onBtnOKEnable()
-{
-    if ((ui->label_name->text().length()) )
-}
 
-//void Resign::onIsSameName()
-//{
-//    qDebug("[%s]", __PRETTY_FUNCTION__);
-//    ui->label_name->setText("ok");
-//}
+void Resign::closeEvent()
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+}

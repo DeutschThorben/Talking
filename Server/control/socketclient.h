@@ -4,8 +4,10 @@
 #include <QObject>
 #include <iostream>
 #include <QtNetwork/QTcpSocket>
+
 #include "control/package.h"
-#include "control/socketmessage.h"
+
+
 #include "model/userlist.h"
 #include "model/userinformation.h"
 
@@ -24,9 +26,12 @@ public:
     void onWhetherIsSame(QString name);
     // user is talking with other user
     void onTalkingWithOther(QString name, QString otherUser, QString talkInformation);
+    // user find new friend
+    void onFindNewFriend(QString name);
 
 signals:
     void UserStateChange(QString, QString);
+    void UserExit(QString);
 
 public slots:
     void onReadyRead();
@@ -40,7 +45,7 @@ private:
 
     QTcpSocket *m_socket;
     UserList  *m_userList;
-    SocketMessage *m_message;
+//    SocketMessage *m_message;
 };
 
 #endif // SOCKETCLIENT_H

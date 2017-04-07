@@ -10,6 +10,8 @@ enum PackageType {
     USER_Regist_IsSameName,
     USER_Talking,
     USER_TalkingAll,
+    USER_FindFriend,
+    USER_Exit
 };
 
 struct Package {

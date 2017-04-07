@@ -21,10 +21,9 @@ bool UserList::onAddUser(UserInformation *user)
     query.bindValue(0, user->getUserName());
     query.bindValue(":keyword", user->getUserKeyword());
     query.bindValue(":state", 0);
-    query.exec();
+    ret = query.exec();
 
-    ret = query.next();
-    qDebug("[%s] A new user is add in sqlite success already", __PRETTY_FUNCTION__);
+    qDebug("[%s] A new user is add in sqlite success already ret = [%d]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onDestroyConnect();
     return ret;
     // onAddUser   <-Introduction
@@ -55,7 +54,7 @@ bool UserList::onLoginUser(QString name, QString keyword)
     }
     else {
         // change user state
-        query.prepare("update user set state where name = :name");
+        query.prepare("update user set state = :state where name = :name");
         query.bindValue(":name", name);
         query.bindValue(":state", 1);
         query.exec();
@@ -79,9 +78,12 @@ bool UserList::onIsRegisterUser(UserInformation *user)
 
     query.prepare("select name from user where name = :name");
     query.bindValue(":name", user->getUserName());
-    query.exec();
+    bool tmp = query.exec();
 
     ret = query.next();
+
+    qDebug("[%s] tmp is [%d]", __PRETTY_FUNCTION__, tmp);
+    qDebug("[%s] ret is [%d]", __PRETTY_FUNCTION__, ret);
 
     ControlSqlite::getInstance()->onDestroyConnect();
     return ret;
@@ -93,7 +95,7 @@ bool UserList::onIsRegisterUser(UserInformation *user)
  *  Introduction: user exit and change user state
  *  ReturnValue: nothing
  */
-void UserList::onRemoveUser(UserInformation *user)
+void UserList::onRemoveUser(QString name)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
@@ -101,7 +103,7 @@ void UserList::onRemoveUser(UserInformation *user)
 
     query.prepare("update user set state = :state where name = :name");
     query.bindValue(":state", 0);
-    query.bindValue(":name", user->getUserName());
+    query.bindValue(":name", name);
     query.exec();
 
     ControlSqlite::getInstance()->onDestroyConnect();
@@ -149,7 +151,6 @@ QString UserList::onSelectSomeName(int m_ID)
 
     while (query.next()) {
         m_name = query.value("name").toString();
-        qDebug("[%s] m_name = [%s]", __PRETTY_FUNCTION__, m_name.toStdString().c_str());
     }
 
     ControlSqlite::getInstance()->onDestroyConnect();
@@ -176,7 +177,6 @@ int UserList::onSelectSomeState(int m_ID)
 
     while (query.next()) {
         m_state = query.value("state").toInt();
-        qDebug("[%s] m_state = [%d]", __PRETTY_FUNCTION__, m_state);
     }
     ControlSqlite::getInstance()->onDestroyConnect();
     return m_state;
@@ -215,7 +215,7 @@ int UserList::onMaxID()
     while(query.next()) {
         maxValue = query.value(0).toInt();
     }
-
+    ControlSqlite::getInstance()->onDestroyConnect();
     return maxValue;
     // onMaxID   <-Introduction
 }

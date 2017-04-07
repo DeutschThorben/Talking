@@ -5,7 +5,8 @@
 #include <QMap>
 #include <iostream>
 #include <QtNetwork/QTcpSocket>
-// #include "control/socketclient.h"
+
+#include "control/socketclient.h"
 
 class SocketMessage : public QObject
 {
@@ -13,7 +14,7 @@ class SocketMessage : public QObject
 public:
     static SocketMessage* getInstance();
 
-    // void onClientRegist(SocketClient *client);
+    void onClientRegist(SocketClient *client);
     bool isUserOnline(QString name);
     QTcpSocket* onFindSockedByName(QString name);
 
@@ -24,7 +25,7 @@ public slots:
 private:
     explicit SocketMessage(QObject *parent = 0);
 
-    // QVector<SocketClient*> vector_clients;
+    QVector<SocketClient*> vector_clients;
     QMap<QString, QTcpSocket*> map_onlineUser;
     static SocketMessage* instance;
 };

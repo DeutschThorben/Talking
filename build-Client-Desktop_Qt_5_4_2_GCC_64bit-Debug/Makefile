@@ -12,10 +12,10 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_SQL_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../Client -I. -I../../Qt5.4.2/5.4/gcc_64/include -I../../Qt5.4.2/5.4/gcc_64/include/QtWidgets -I../../Qt5.4.2/5.4/gcc_64/include/QtGui -I../../Qt5.4.2/5.4/gcc_64/include/QtNetwork -I../../Qt5.4.2/5.4/gcc_64/include/QtCore -I. -I. -I../../Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++
+INCPATH       = -I../Client -I. -I../../Qt5.4.2/5.4/gcc_64/include -I../../Qt5.4.2/5.4/gcc_64/include/QtWidgets -I../../Qt5.4.2/5.4/gcc_64/include/QtGui -I../../Qt5.4.2/5.4/gcc_64/include/QtNetwork -I../../Qt5.4.2/5.4/gcc_64/include/QtSql -I../../Qt5.4.2/5.4/gcc_64/include/QtCore -I. -I. -I../../Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -36,7 +36,7 @@ DISTNAME      = Client1.0.0
 DISTDIR = /home/gaofanchao/project/Client/.tmp/Client1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/home/gaofanchao/Qt5.4.2/5.4/gcc_64 -Wl,-rpath,/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib
-LIBS          = $(SUBLIBS) -L/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib -lQt5Widgets -lQt5Gui -lQt5Network -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -L/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib -lQt5Widgets -lQt5Gui -lQt5Network -lQt5Sql -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -52,21 +52,37 @@ SOURCES       = ../Client/main.cpp \
 		../Client/client.cpp \
 		../Client/screen/talking.cpp \
 		../Client/screen/resign.cpp \
-		../Client/model/clientcommon.cpp qrc_picture.cpp \
+		../Client/model/clientcommon.cpp \
+		../Client/screen/talkinglistscreen.cpp \
+		../Client/screen/addnewfriend.cpp \
+		../Client/screen/makemasses.cpp \
+		../Client/model/friendlist.cpp qrc_picture.cpp \
 		moc_client.cpp \
 		moc_talking.cpp \
 		moc_resign.cpp \
-		moc_clientcommon.cpp
+		moc_clientcommon.cpp \
+		moc_talkinglistscreen.cpp \
+		moc_addnewfriend.cpp \
+		moc_makemasses.cpp \
+		moc_friendlist.cpp
 OBJECTS       = main.o \
 		client.o \
 		talking.o \
 		resign.o \
 		clientcommon.o \
+		talkinglistscreen.o \
+		addnewfriend.o \
+		makemasses.o \
+		friendlist.o \
 		qrc_picture.o \
 		moc_client.o \
 		moc_talking.o \
 		moc_resign.o \
-		moc_clientcommon.o
+		moc_clientcommon.o \
+		moc_talkinglistscreen.o \
+		moc_addnewfriend.o \
+		moc_makemasses.o \
+		moc_friendlist.o
 DIST          = ../../Qt5.4.2/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		../../Qt5.4.2/5.4/gcc_64/mkspecs/common/shell-unix.conf \
 		../../Qt5.4.2/5.4/gcc_64/mkspecs/common/unix.conf \
@@ -190,11 +206,19 @@ DIST          = ../../Qt5.4.2/5.4/gcc_64/mkspecs/features/spec_pre.prf \
 		../Client/model/package.h \
 		../Client/screen/talking.h \
 		../Client/screen/resign.h \
-		../Client/model/clientcommon.h ../Client/main.cpp \
+		../Client/model/clientcommon.h \
+		../Client/screen/talkinglistscreen.h \
+		../Client/screen/addnewfriend.h \
+		../Client/screen/makemasses.h \
+		../Client/model/friendlist.h ../Client/main.cpp \
 		../Client/client.cpp \
 		../Client/screen/talking.cpp \
 		../Client/screen/resign.cpp \
-		../Client/model/clientcommon.cpp
+		../Client/model/clientcommon.cpp \
+		../Client/screen/talkinglistscreen.cpp \
+		../Client/screen/addnewfriend.cpp \
+		../Client/screen/makemasses.cpp \
+		../Client/model/friendlist.cpp
 QMAKE_TARGET  = Client
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = Client
@@ -222,7 +246,7 @@ first: all
 
 ####### Build rules
 
-$(TARGET): ui_client.h ui_talking.h ui_resign.h $(OBJECTS)  
+$(TARGET): ui_client.h ui_talking.h ui_resign.h ui_talkinglistscreen.h ui_addnewfriend.h ui_makemasses.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: ../Client/Client.pro ../../Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++/qmake.conf ../../Qt5.4.2/5.4/gcc_64/mkspecs/features/spec_pre.prf \
@@ -349,7 +373,8 @@ Makefile: ../Client/Client.pro ../../Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++/qmake.
 		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Widgets.prl \
 		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Gui.prl \
 		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Core.prl \
-		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Network.prl
+		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Network.prl \
+		/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Sql.prl
 	$(QMAKE) -spec linux-g++ CONFIG+=debug -o Makefile ../Client/Client.pro
 ../../Qt5.4.2/5.4/gcc_64/mkspecs/features/spec_pre.prf:
 ../../Qt5.4.2/5.4/gcc_64/mkspecs/common/shell-unix.conf:
@@ -476,6 +501,7 @@ Makefile: ../Client/Client.pro ../../Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++/qmake.
 /home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Gui.prl:
 /home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Core.prl:
 /home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Network.prl:
+/home/gaofanchao/Qt5.4.2/5.4/gcc_64/lib/libQt5Sql.prl:
 qmake: FORCE
 	@$(QMAKE) -spec linux-g++ CONFIG+=debug -o Makefile ../Client/Client.pro
 
@@ -491,9 +517,9 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../Client/picture.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents ../Client/client.h ../Client/model/package.h ../Client/screen/talking.h ../Client/screen/resign.h ../Client/model/clientcommon.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../Client/main.cpp ../Client/client.cpp ../Client/screen/talking.cpp ../Client/screen/resign.cpp ../Client/model/clientcommon.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../Client/client.ui ../Client/screen/talking.ui ../Client/screen/resign.ui $(DISTDIR)/
+	$(COPY_FILE) --parents ../Client/client.h ../Client/model/package.h ../Client/screen/talking.h ../Client/screen/resign.h ../Client/model/clientcommon.h ../Client/screen/talkinglistscreen.h ../Client/screen/addnewfriend.h ../Client/screen/makemasses.h ../Client/model/friendlist.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../Client/main.cpp ../Client/client.cpp ../Client/screen/talking.cpp ../Client/screen/resign.cpp ../Client/model/clientcommon.cpp ../Client/screen/talkinglistscreen.cpp ../Client/screen/addnewfriend.cpp ../Client/screen/makemasses.cpp ../Client/model/friendlist.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../Client/client.ui ../Client/screen/talking.ui ../Client/screen/resign.ui ../Client/screen/talkinglistscreen.ui ../Client/screen/addnewfriend.ui ../Client/screen/makemasses.ui $(DISTDIR)/
 
 
 clean:compiler_clean 
@@ -522,9 +548,9 @@ qrc_picture.cpp: ../Client/picture.qrc \
 		../Client/failure.png
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/rcc -name picture ../Client/picture.qrc -o qrc_picture.cpp
 
-compiler_moc_header_make_all: moc_client.cpp moc_talking.cpp moc_resign.cpp moc_clientcommon.cpp
+compiler_moc_header_make_all: moc_client.cpp moc_talking.cpp moc_resign.cpp moc_clientcommon.cpp moc_talkinglistscreen.cpp moc_addnewfriend.cpp moc_makemasses.cpp moc_friendlist.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_client.cpp moc_talking.cpp moc_resign.cpp moc_clientcommon.cpp
+	-$(DEL_FILE) moc_client.cpp moc_talking.cpp moc_resign.cpp moc_clientcommon.cpp moc_talkinglistscreen.cpp moc_addnewfriend.cpp moc_makemasses.cpp moc_friendlist.cpp
 moc_client.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmainwindow.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qwidget.h \
@@ -642,6 +668,12 @@ moc_client.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
 		../Client/model/clientcommon.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
 		../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
@@ -651,9 +683,29 @@ moc_client.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
+		../Client/screen/talkinglistscreen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../Client/screen/addnewfriend.h \
+		../Client/screen/makemasses.h \
 		../Client/screen/talking.h \
 		../Client/client.h
-	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/client.h -o moc_client.cpp
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/client.h -o moc_client.cpp
 
 moc_talking.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qwidget.h \
@@ -757,8 +809,24 @@ moc_talking.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfiledevice.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvector2d.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdialog.h \
+		../Client/model/package.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/clientcommon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
 		../Client/screen/talking.h
-	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/screen/talking.h -o moc_talking.cpp
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/screen/talking.h -o moc_talking.cpp
 
 moc_resign.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qwidget.h \
@@ -865,13 +933,6 @@ moc_resign.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdialog.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
-		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
-		../Client/model/package.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
-		../Client/model/clientcommon.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
@@ -879,8 +940,21 @@ moc_resign.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
+		../Client/model/package.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/clientcommon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
 		../Client/screen/resign.h
-	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/screen/resign.h -o moc_resign.cpp
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/screen/resign.h -o moc_resign.cpp
 
 moc_clientcommon.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject.h \
@@ -932,6 +1006,10 @@ moc_clientcommon.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -954,14 +1032,442 @@ moc_clientcommon.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
 		../Client/model/package.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
 		../Client/model/clientcommon.h
-	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/model/clientcommon.h -o moc_clientcommon.cpp
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/model/clientcommon.h -o moc_clientcommon.cpp
+
+moc_talkinglistscreen.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobal.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qconfig.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlogging.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qflags.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmutex.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstring.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qchar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiterator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmargins.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrect.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsize.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpalette.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcolor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qrgb.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpair.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregexp.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qbrush.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvector.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qregion.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qline.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtransform.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qimage.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qhash.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfont.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvariant.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdebug.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlocale.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfile.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qicon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../Client/screen/addnewfriend.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdialog.h \
+		../Client/model/clientcommon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../Client/model/package.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
+		../Client/screen/makemasses.h \
+		../Client/screen/talking.h \
+		../Client/screen/talkinglistscreen.h
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/screen/talkinglistscreen.h -o moc_talkinglistscreen.cpp
+
+moc_addnewfriend.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobal.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qconfig.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlogging.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qflags.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmutex.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstring.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qchar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiterator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmargins.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrect.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsize.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpalette.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcolor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qrgb.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpair.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregexp.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qbrush.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvector.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qregion.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qline.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtransform.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qimage.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qhash.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfont.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvariant.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdebug.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlocale.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfile.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdialog.h \
+		../Client/model/clientcommon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
+		../Client/model/package.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
+		../Client/screen/addnewfriend.h
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/screen/addnewfriend.h -o moc_addnewfriend.cpp
+
+moc_makemasses.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobal.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qconfig.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlogging.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qflags.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmutex.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstring.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qchar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiterator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmargins.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrect.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsize.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpalette.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcolor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qrgb.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpair.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregexp.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qbrush.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvector.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qregion.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qline.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtransform.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qimage.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qhash.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfont.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvariant.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdebug.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlocale.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfile.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		../Client/screen/makemasses.h
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/screen/makemasses.h -o moc_makemasses.cpp
+
+moc_friendlist.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobal.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qconfig.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlogging.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qflags.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmutex.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstring.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qchar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiterator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../Client/model/friendlist.h
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/moc $(DEFINES) -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/mkspecs/linux-g++ -I/home/gaofanchao/project/Client -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtWidgets -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtGui -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtNetwork -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtSql -I/home/gaofanchao/Qt5.4.2/5.4/gcc_64/include/QtCore -I. ../Client/model/friendlist.h -o moc_friendlist.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_client.h ui_talking.h ui_resign.h
+compiler_uic_make_all: ui_client.h ui_talking.h ui_resign.h ui_talkinglistscreen.h ui_addnewfriend.h ui_makemasses.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_client.h ui_talking.h ui_resign.h
+	-$(DEL_FILE) ui_client.h ui_talking.h ui_resign.h ui_talkinglistscreen.h ui_addnewfriend.h ui_makemasses.h
 ui_client.h: ../Client/client.ui
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/uic ../Client/client.ui -o ui_client.h
 
@@ -970,6 +1476,15 @@ ui_talking.h: ../Client/screen/talking.ui
 
 ui_resign.h: ../Client/screen/resign.ui
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/uic ../Client/screen/resign.ui -o ui_resign.h
+
+ui_talkinglistscreen.h: ../Client/screen/talkinglistscreen.ui
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/uic ../Client/screen/talkinglistscreen.ui -o ui_talkinglistscreen.h
+
+ui_addnewfriend.h: ../Client/screen/addnewfriend.ui
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/uic ../Client/screen/addnewfriend.ui -o ui_addnewfriend.h
+
+ui_makemasses.h: ../Client/screen/makemasses.ui
+	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/uic ../Client/screen/makemasses.ui -o ui_makemasses.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -1099,6 +1614,12 @@ main.o: ../Client/main.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
 		../Client/model/clientcommon.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
 		../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
@@ -1108,6 +1629,26 @@ main.o: ../Client/main.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
+		../Client/screen/talkinglistscreen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../Client/screen/addnewfriend.h \
+		../Client/screen/makemasses.h \
 		../Client/screen/talking.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QApplication \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qapplication.h \
@@ -1236,6 +1777,12 @@ client.o: ../Client/client.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
 		../Client/model/clientcommon.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
 		../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
@@ -1245,6 +1792,26 @@ client.o: ../Client/client.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
+		../Client/screen/talkinglistscreen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../Client/screen/addnewfriend.h \
+		../Client/screen/makemasses.h \
 		../Client/screen/talking.h \
 		ui_client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
@@ -1262,20 +1829,6 @@ client.o: ../Client/client.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qbuttongroup.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QHeaderView \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qheaderview.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMenuBar \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmenubar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmenu.h \
@@ -1391,6 +1944,22 @@ talking.o: ../Client/screen/talking.cpp ../Client/screen/talking.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfiledevice.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvector2d.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdialog.h \
+		../Client/model/package.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/clientcommon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
 		ui_talking.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QAction \
@@ -1423,7 +1992,20 @@ talking.o: ../Client/screen/talking.cpp ../Client/screen/talking.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QPushButton \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QTextEdit \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtextedit.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextdocument.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o talking.o ../Client/screen/talking.cpp
 
 resign.o: ../Client/screen/resign.cpp ../Client/screen/resign.h \
@@ -1532,13 +2114,6 @@ resign.o: ../Client/screen/resign.cpp ../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdialog.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
-		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
-		../Client/model/package.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
-		../Client/model/clientcommon.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
@@ -1546,6 +2121,19 @@ resign.o: ../Client/screen/resign.cpp ../Client/screen/resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
+		../Client/model/package.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/clientcommon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
 		ui_resign.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QAction \
@@ -1643,6 +2231,10 @@ clientcommon.o: ../Client/model/clientcommon.cpp ../Client/model/clientcommon.h 
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
@@ -1664,8 +2256,547 @@ clientcommon.o: ../Client/model/clientcommon.cpp ../Client/model/clientcommon.h 
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
 		../Client/model/package.h \
-		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o clientcommon.o ../Client/model/clientcommon.cpp
+
+talkinglistscreen.o: ../Client/screen/talkinglistscreen.cpp ../Client/screen/talkinglistscreen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobal.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qconfig.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlogging.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qflags.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmutex.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstring.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qchar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiterator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmargins.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrect.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsize.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpalette.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcolor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qrgb.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpair.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregexp.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qbrush.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvector.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qregion.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qline.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtransform.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qimage.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qhash.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfont.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvariant.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdebug.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlocale.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfile.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qicon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../Client/screen/addnewfriend.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdialog.h \
+		../Client/model/clientcommon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../Client/model/package.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
+		../Client/screen/makemasses.h \
+		../Client/screen/talking.h \
+		ui_talkinglistscreen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QAction \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qaction.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qactiongroup.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QApplication \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qapplication.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreapplication.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qeventloop.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qguiapplication.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qinputmethod.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QButtonGroup \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qbuttongroup.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QHBoxLayout \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qboxlayout.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlayout.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlayoutitem.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qgridlayout.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QHeaderView \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qheaderview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLabel \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlabel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QPushButton \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QSpacerItem \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QVBoxLayout
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o talkinglistscreen.o ../Client/screen/talkinglistscreen.cpp
+
+addnewfriend.o: ../Client/screen/addnewfriend.cpp ../Client/screen/addnewfriend.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobal.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qconfig.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlogging.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qflags.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmutex.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstring.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qchar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiterator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmargins.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrect.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsize.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpalette.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcolor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qrgb.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpair.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregexp.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qbrush.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvector.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qregion.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qline.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtransform.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qimage.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qhash.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfont.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvariant.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdebug.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlocale.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfile.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdialog.h \
+		../Client/model/clientcommon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlQuery \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/QTcpSocket \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qtcpsocket.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtNetwork/qabstractsocket.h \
+		../Client/model/package.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QString \
+		../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
+		ui_addnewfriend.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QAction \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qaction.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qicon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qactiongroup.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QApplication \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qapplication.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreapplication.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qeventloop.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qguiapplication.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qinputmethod.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QButtonGroup \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qbuttongroup.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QHBoxLayout \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qboxlayout.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlayout.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlayoutitem.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qgridlayout.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QHeaderView \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qheaderview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLabel \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlabel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLineEdit \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlineedit.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpen.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtextoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QPushButton \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qpushbutton.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractbutton.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QVBoxLayout
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o addnewfriend.o ../Client/screen/addnewfriend.cpp
+
+makemasses.o: ../Client/screen/makemasses.cpp ../Client/screen/makemasses.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobal.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qconfig.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlogging.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qflags.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmutex.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstring.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qchar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiterator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmargins.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpaintdevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrect.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsize.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpoint.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpalette.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcolor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qrgb.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdatastream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiodevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qpair.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregexp.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringmatcher.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qbrush.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvector.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qmatrix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpolygon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qregion.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qline.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtransform.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpainterpath.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qimage.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixelformat.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qpixmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qshareddata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qhash.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfont.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontmetrics.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qfontinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qcursor.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qkeysequence.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvariant.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qdebug.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtextstream.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlocale.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qset.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qurlquery.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfile.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfiledevice.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvector2d.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qtouchdevice.h \
+		ui_makemasses.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QVariant \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QAction \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qaction.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qicon.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qactiongroup.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QApplication \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qapplication.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreapplication.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qeventloop.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qdesktopwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qguiapplication.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qinputmethod.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QButtonGroup \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qbuttongroup.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QHeaderView \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qheaderview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemview.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qframe.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qitemselectionmodel.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/qvalidator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qregularexpression.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o makemasses.o ../Client/screen/makemasses.cpp
+
+friendlist.o: ../Client/model/friendlist.cpp ../Client/model/friendlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/QObject \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnamespace.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobal.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qconfig.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qfeatures.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsystemdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qprocessordetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypeinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qtypetraits.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qsysinfo.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlogging.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qflags.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbasicatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qgenericatomic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_mips.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_x86.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qatomic_unix.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qglobalstatic.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmutex.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qnumeric.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstring.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qchar.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qrefcount.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qarraydata.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qstringbuilder.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qlist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qalgorithms.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qiterator.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qbytearraylist.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcoreevent.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qscopedpointer.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qmetatype.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qisenum.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtCore/qobject_impl.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/QSqlDatabase \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsqldatabase.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtSql/qsql.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o friendlist.o ../Client/model/friendlist.cpp
 
 qrc_picture.o: qrc_picture.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_picture.o qrc_picture.cpp
@@ -1681,6 +2812,18 @@ moc_resign.o: moc_resign.cpp
 
 moc_clientcommon.o: moc_clientcommon.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_clientcommon.o moc_clientcommon.cpp
+
+moc_talkinglistscreen.o: moc_talkinglistscreen.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_talkinglistscreen.o moc_talkinglistscreen.cpp
+
+moc_addnewfriend.o: moc_addnewfriend.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_addnewfriend.o moc_addnewfriend.cpp
+
+moc_makemasses.o: moc_makemasses.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_makemasses.o moc_makemasses.cpp
+
+moc_friendlist.o: moc_friendlist.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_friendlist.o moc_friendlist.cpp
 
 ####### Install
 

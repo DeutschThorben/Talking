@@ -1,10 +1,10 @@
 #include "socketclient.h"
+#include "control/socketmessage.h"
 
 SocketClient::SocketClient(QTcpSocket *socket, QObject *parent) : QObject(parent), m_socket(socket)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     m_userList = new UserList();
-    m_message = SocketMessage::getInstance();
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 }
 
@@ -12,9 +12,6 @@ SocketClient::~SocketClient()
 {
     delete m_userList;
     m_userList = NULL;
-
-    delete m_message;
-    m_message = NULL;
 }
 
 void SocketClient::onReadyRead()
@@ -43,6 +40,14 @@ void SocketClient::onReadyRead()
     case USER_Talking:
         qDebug("[%s] Client is talking with other", __PRETTY_FUNCTION__);
         onTalkingWithOther(m_name, m_otherUser, m_talkInformation);
+        break;
+    case USER_FindFriend:
+        qDebug("[%s] Client add new friend", __PRETTY_FUNCTION__);
+        onFindNewFriend(m_otherUser);
+        break;
+    case USER_Exit:
+        qDebug("[%s] Client exit", __PRETTY_FUNCTION__);
+        emit UserExit(m_name);
         break;
     default:
         break;
@@ -88,11 +93,12 @@ void SocketClient::onWritePackage(PackageType head, QString name, QString otherU
     qDebug("[%s] bag.otherUser is [%s]", __PRETTY_FUNCTION__, bag.otherUser);
     qDebug("[%s]result is [%d]", __PRETTY_FUNCTION__, bag.result);
 
+    SocketMessage *m_message = SocketMessage::getInstance();
     QTcpSocket *sockfd = m_message->onFindSockedByName(name);
 
     if ((NULL != sockfd) && (m_socket != sockfd)) {
         // talking with other
-        qDebug("[%s] send message to other", __PRETTY_FUNCTION__);
+        qDebug("[%s] send message to other   socket is [%p]", __PRETTY_FUNCTION__, sockfd);
         sockfd->write((char*)(&bag), sizeof(Package));
     }
     else {
@@ -117,15 +123,15 @@ void SocketClient::onNewUserRegist(QString name, QString keyword)
 
     if (m_userList->onAddUser(user_information)) {
         // user register success
-        ret = 0;
+        ret = 1;
         emit UserStateChange("Regist", name);
     }
     else {
         // user register failure
-        ret = 1;
+        ret = 0;
     }
 
-    qDebug("[%s] take the bag to client about regist", __PRETTY_FUNCTION__);
+    qDebug("[%s] take the bag to client about regist ret = [%d]", __PRETTY_FUNCTION__, ret);
     onWritePackage(USER_Regist, "", "", "", ret);
     // onNewUserRegist   <-Introduction
 }
@@ -141,15 +147,12 @@ void SocketClient::onWhetherIsSame(QString name)
     int ret = 0;
     UserInformation *user_information = new UserInformation(name, "");
     if (m_userList->onIsRegisterUser(user_information)) {
-        qDebug("[%s]dddd", __PRETTY_FUNCTION__);
         ret = 1;
     }
     else {
-        qDebug("[%s]eeee", __PRETTY_FUNCTION__);
         ret = 0;
     }
 
-    qDebug("[%s] ret = [%d]", __PRETTY_FUNCTION__, ret);
     onWritePackage(USER_Regist_IsSameName, "", "", "", ret);
     // onWhetherIsSame   <-Introduction
 }
@@ -163,6 +166,7 @@ void SocketClient::onUserLogin(QString name, QString keyword)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     int ret = 0;
+    SocketMessage *m_message = SocketMessage::getInstance();
     if (m_message->isUserOnline(name)) {
         // this user is logined already
         ret = 2;
@@ -191,13 +195,33 @@ void SocketClient::onTalkingWithOther(QString name, QString otherUser, QString t
 }
 
 /*
+ *  onFindNewFriend
+ *  Introduction: the name whether is exist in user list ( USER_FindFriend )
+ *  ReturnValue: the name is exist (1), not exist (0)
+ */
+void SocketClient::onFindNewFriend(QString name)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    int ret = 0;
+    UserInformation *user_information = new UserInformation(name, "");
+    if (m_userList->onIsRegisterUser(user_information)) {
+        ret = 1;
+    }
+    else {
+        ret = 0;
+    }
+
+    onWritePackage(USER_FindFriend, "", "", "", ret);
+    // onFindNewFriend   <-Introduction
+}
+
+/*
  *  onQStringChangeToChar
  *  Instruction: change type from QString to char*
  *  ReturnValue: char* text
  */
 const char* SocketClient::onQStringChangeToChar(QString b_text)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     const char* a_text = b_text.toStdString().data();
     return a_text;
     // onQStringChangeToChar   <-Introduction
@@ -210,7 +234,6 @@ const char* SocketClient::onQStringChangeToChar(QString b_text)
  */
 QString SocketClient::onCharToQString(const char *b_text)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     QString a_text = QString::fromStdString(b_text);
     return a_text;
     // onCharToQString   <-Introduction
