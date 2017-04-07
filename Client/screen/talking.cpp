@@ -10,6 +10,9 @@ Talking::Talking(QTcpSocket *sockfd, QString name, QString otherName, QWidget *p
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     ui->setupUi(this);
+
+    setAttribute(Qt::WA_DeleteOnClose);
+
     m_clientCommon = ClientCommon::getInstance();
     m_clientCommon->setSocket(m_socked);
 

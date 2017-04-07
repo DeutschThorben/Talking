@@ -12,7 +12,6 @@ UserList::UserList(QObject *parent) : QObject(parent)
  */
 bool UserList::onAddUser(UserInformation *user)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
     QSqlQuery query;
     bool ret = false;
@@ -36,7 +35,6 @@ bool UserList::onAddUser(UserInformation *user)
  */
 bool UserList::onLoginUser(QString name, QString keyword)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
     QSqlQuery query;
     bool ret = false;
@@ -71,7 +69,6 @@ bool UserList::onLoginUser(QString name, QString keyword)
  */
 bool UserList::onIsRegisterUser(UserInformation *user)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
     QSqlQuery query;
     bool ret = false;
@@ -97,7 +94,6 @@ bool UserList::onIsRegisterUser(UserInformation *user)
  */
 void UserList::onRemoveUser(QString name)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
     QSqlQuery query;
 
@@ -112,7 +108,6 @@ void UserList::onRemoveUser(QString name)
 
 void UserList::onDeleteUser(QString name)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
     QSqlQuery query;
 
@@ -139,7 +134,6 @@ void UserList::onDeleteUser(QString name)
  */
 QString UserList::onSelectSomeName(int m_ID)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
 
     QSqlQuery query;
@@ -158,6 +152,23 @@ QString UserList::onSelectSomeName(int m_ID)
     // onSelectSomeName   <-Introduction
 }
 
+bool UserList::onSelectSomeNameByName(QString m_name)
+{
+    ControlSqlite::getInstance()->onCreateConnect();
+
+    QSqlQuery query;
+    QString name;
+
+    query.prepare("select name from user where name = :name");
+    query.bindValue(":name", m_name);
+    query.exec();
+
+    bool ret = query.next();
+    ControlSqlite::getInstance()->onDestroyConnect();
+    return ret;
+    // onSelectSomeName   <-Introduction
+}
+
 /*
  *  onSelectSomeState
  *  Introduction: find user'state by ID
@@ -165,7 +176,6 @@ QString UserList::onSelectSomeName(int m_ID)
  */
 int UserList::onSelectSomeState(int m_ID)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
 
     QSqlQuery query;
@@ -190,7 +200,6 @@ int UserList::onSelectSomeState(int m_ID)
  */
 int UserList::onListBiggerLine()
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
     QSqlQuery query("select count(*) as numberoforders from user");
     int num = 0;
@@ -206,7 +215,6 @@ int UserList::onListBiggerLine()
 
 int UserList::onMaxID()
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     ControlSqlite::getInstance()->onCreateConnect();
     int maxValue;
 

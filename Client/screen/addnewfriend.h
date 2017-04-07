@@ -22,6 +22,7 @@ public:
 
 private slots:
     void onFindThisNameClicked();
+    void onExitScreenClicked();
 
     void onFeedBackFind();
 

@@ -47,8 +47,6 @@ void Server::onConnection()
     QTcpSocket *socked = m_server->nextPendingConnection();
     new_client = new SocketClient(socked);
     qDebug("[%s]  socket is [%p]", __PRETTY_FUNCTION__, socked);
-    SocketMessage *message = SocketMessage::getInstance();
-    message->onClientRegist(new_client);
     connect(new_client, SIGNAL(UserStateChange(QString, QString)), this, SLOT(onFreshUserList(QString, QString)));
     connect(new_client, SIGNAL(UserExit(QString)), this, SLOT(onUserExit(QString)));
 
@@ -122,7 +120,9 @@ void Server::onBtnDeleteClicked()
 
 void Server::onBtnExitClicked()
 {
+    qDebug("[%s]", __PRETTY_FUNCTION__);
     close();
+    // onBtnExitClicked   <-Introduction
 }
 
 void Server::onGetListText(QString list_text)
@@ -153,6 +153,7 @@ void Server::onFreshUserList(QString state, QString name)
 
 void Server::onUserExit(QString m_name)
 {
+    qDebug("[%s]", __PRETTY_FUNCTION__);
     m_userList->onRemoveUser(m_name);
 
     onFreshUserList("Exit", m_name);

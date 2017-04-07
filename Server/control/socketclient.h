@@ -29,6 +29,8 @@ public:
     // user find new friend
     void onFindNewFriend(QString name);
 
+    void sendOnlineUserToEvery(QString, QTcpSocket*);
+
 signals:
     void UserStateChange(QString, QString);
     void UserExit(QString);

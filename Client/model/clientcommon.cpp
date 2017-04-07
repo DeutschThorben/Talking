@@ -69,7 +69,6 @@ void ClientCommon::onWritePackage(PackageType head, QString name, QString keywor
  */
 const char* ClientCommon::onQStringChangeToChar(QString b_text)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     const char* a_text = b_text.toStdString().data();
     return a_text;
     // onQStringChangeToChar   <-Introduction
@@ -82,7 +81,6 @@ const char* ClientCommon::onQStringChangeToChar(QString b_text)
  */
 QString ClientCommon::onCharToQString(char *b_text)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     QString a_text = QString::fromStdString(b_text);
     return a_text;
     // onCharToQString   <-Introduction
@@ -94,16 +92,17 @@ void ClientCommon::setSocket(QTcpSocket *socket)
     m_socked = socket;
 }
 
-
+/*
+ *  createFriendList
+ *  Introduction: create new friend table when a new user has registed
+ *  ReturnValue: nothing
+ */
 void ClientCommon::createFriendList(QString name)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     FriendList::getInstance()->onCreateConnect();
     QSqlQuery query;
-
     QString word = "create table " + name +" (ID integer primary key autoincrement, name verchar(20), state integer)";
-//    query.prepare("create table :name (ID integer primary key autoincrement, name verchar(20), state integer)");
-//    query.bindValue(":name", name);
 
     bool ret = query.exec(word);
     bool tmp = query.next();
@@ -113,6 +112,11 @@ void ClientCommon::createFriendList(QString name)
     // createFriendList   <-Introduction
 }
 
+/*
+ *  addAFriendUser
+ *  Introduction: add a new friend to friend list
+ *  ReturnValue: nothing
+ */
 void ClientCommon::addAFriendUser(QString f_name, QString m_name)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
@@ -131,9 +135,13 @@ void ClientCommon::addAFriendUser(QString f_name, QString m_name)
     // addAFriendUser   <-Introduction
 }
 
+/*
+ *  findAllFriendName
+ *  Introduction: take all name of friend to screen
+ *  ReturnValue: all name of friend
+ */
 QString ClientCommon::findAllFriendName(int m_ID, QString m_name)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     FriendList::getInstance()->onCreateConnect();
     QSqlQuery query;
     QString word = "select name from " + m_name + " where ID = :ID";
@@ -152,9 +160,13 @@ QString ClientCommon::findAllFriendName(int m_ID, QString m_name)
     // findAllFriendName   <-Introduction
 }
 
+/*
+ *  findAllFriendState
+ *  Introduction: take all state of friend to screen
+ *  ReturnValue: all state of friend
+ */
 int ClientCommon::findAllFriendState(QString f_name, QString m_name)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     FriendList::getInstance()->onCreateConnect();
 
     QSqlQuery query;
@@ -173,14 +185,63 @@ int ClientCommon::findAllFriendState(QString f_name, QString m_name)
     // onSelectSomeState   <-Introduction
 }
 
-void ClientCommon::deleteAFriendUser(QString name)
+/*
+ *  selectNameFromFriendList
+ *  Instruction: select a name from friend list
+ *  ReturnValue: the name is in list (1), isn't in list (0)
+ */
+bool ClientCommon::selectNameFromFriendList(QString f_name, QString m_name)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     FriendList::getInstance()->onCreateConnect();
     QSqlQuery query;
+    QString word = "select name from " + m_name + " where name = :name";
 
-    query.prepare("delete from :name where name = :name");
-    query.bindValue(":name", name);
+    query.prepare(word);
+    query.bindValue(":name", f_name);
+    bool tmp = query.exec();
+
+    bool ret = query.next();
+    qDebug("[%s] tmp is [%d]", __PRETTY_FUNCTION__, tmp);
+    qDebug("[%s] ret is [%d]", __PRETTY_FUNCTION__, ret);
+    FriendList::getInstance()->onDestroyConnect();
+    return ret;
+    // selectNameFromFriendList   <-Introduction
+}
+
+void ClientCommon::changeFriendState(QString f_name, QString m_name)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    FriendList::getInstance()->onCreateConnect();
+    QSqlQuery query;
+    QString word = "update " + m_name + " set state = :state where name = :name";
+
+    query.prepare(word);
+    query.bindValue(":state", 1);
+    query.bindValue(":name", f_name);
+    bool tmp = query.exec();
+
+    bool ret = query.next();
+    qDebug("[%s] tmp is [%d]", __PRETTY_FUNCTION__, tmp);
+    qDebug("[%s] ret is [%d]", __PRETTY_FUNCTION__, ret);
+    FriendList::getInstance()->onDestroyConnect();
+    // changeFriendState   <-Introduction
+}
+
+/*
+ *  deleteAFriendUser
+ *  Introduction: delete a friend
+ *  ReturnValue: nothing
+ */
+void ClientCommon::deleteAFriendUser(QString f_name, QString m_name)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    FriendList::getInstance()->onCreateConnect();
+    QSqlQuery query;
+    QString word = "delete from " + m_name + " where name = :name";
+
+    query.prepare(word);
+    query.bindValue(":name", f_name);
     bool ret = query.exec();
     bool tmp = query.next();
     qDebug("[%s] ret = [%d]", __PRETTY_FUNCTION__, ret);
@@ -189,6 +250,11 @@ void ClientCommon::deleteAFriendUser(QString name)
     // addAFriendUser   <-Introduction
 }
 
+/*
+ *  getFriendMax
+ *  Introduction: get max number of friend
+ *  ReturnValue: the number of max friend
+ */
 int ClientCommon::getFriendMax(QString m_name)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);

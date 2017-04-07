@@ -22,15 +22,31 @@ public:
 
     void setSocket(QTcpSocket*);
 
+    // create new friend table when a new user has registed
     void createFriendList(QString);
+
+    // add a new friend to friend list
     void addAFriendUser(QString, QString);
+
+    // take all name of friend to screen
     QString findAllFriendName(int, QString);
+
+    // take all state of friend to screen
     int findAllFriendState(QString, QString);
-    void deleteAFriendUser(QString name);
+
+    // select a name from friend list
+    bool selectNameFromFriendList(QString, QString);
+
+    // change user state
+    void changeFriendState(QString, QString);
+
+    // delete a friend
+    void deleteAFriendUser(QString, QString);
+
+    // get max number of friend
     int getFriendMax(QString);
 
 signals:
-    void aaa();
 
 public slots:
 

@@ -26,6 +26,12 @@ void SocketMessage::onClientRegist(SocketClient *client)
     // onClientRegist   <-Introduction
 }
 
+void SocketMessage::insertOnlineUser(QString name, QTcpSocket *socket)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    map_onlineUser.insert(name, socket);
+}
+
 bool SocketMessage::isUserOnline(QString name)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
@@ -45,4 +51,13 @@ QTcpSocket* SocketMessage::onFindSockedByName(QString name)
     QTcpSocket *tmp = map_onlineUser.value(name);
     qDebug("[%s] tmp is [%d]", __PRETTY_FUNCTION__, tmp);
     return map_onlineUser.value(name);
+}
+
+void SocketMessage::sendStateToAll(QString name)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    QMap<QString, QTcpSocket*>::const_iterator iter;
+    for (iter = map_onlineUser.constBegin(); iter != map_onlineUser.constEnd(); ++iter) {
+        ((SocketClient*)(*iter))->sendOnlineUserToEvery(name, iter.value());
+    }
 }

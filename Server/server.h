@@ -11,7 +11,6 @@
 #include <QMessageBox>
 
 #include "control/socketclient.h"
-#include "control/socketmessage.h"
 
 #include "model/userlist.h"
 

@@ -84,11 +84,14 @@ void Client::onReadFromServer()
             screen_talkingList->show();
             close();
         }
-        else if(0 == bag.result) {
-            QMessageBox::warning(NULL, "warnning", "Login failure");
+        else if (2 == bag.result) {
+            QMessageBox::warning(NULL, "warnning", "This user has been logined !");
         }
-        else {
-            QMessageBox::critical(NULL, "critical", "Username or keyword is critical");
+        else if (0 == bag.result) {
+            QMessageBox::critical(NULL, "critical", "Keyword is mistake !");
+        }
+        else if (3 == bag.result) {
+            QMessageBox::critical(NULL, "critical", "Don't have this user !");
         }
     }
     // onReadFromServer   <-Introduction

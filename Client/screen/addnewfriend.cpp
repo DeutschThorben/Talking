@@ -9,19 +9,26 @@ AddNewFriend::AddNewFriend(QTcpSocket *sockfd, QString name, QWidget *parent) :
 {
     ui->setupUi(this);
 
+//    setAttribute(Qt::WA_DeleteOnClose);
+
     m_clientCommon = ClientCommon::getInstance();
     m_clientCommon->setSocket(sockfd);
 
-    connect(ui->btn_find, SIGNAL(clicked(bool)), this, SLOT(onFindThisNameClicked()));
-
+    connect(ui->btn_find, SIGNAL(clicked()), this, SLOT(onFindThisNameClicked()));
+    connect(ui->btn_exit, SIGNAL(clicked()), this, SLOT(onExitScreenClicked()));
     connect(sockfd, SIGNAL(readyRead()), this, SLOT(onFeedBackFind()));
 }
 
 AddNewFriend::~AddNewFriend()
 {
-    disconnect(ui->btn_find, SIGNAL(clicked(bool)), this, SLOT(onFindThisNameClicked()));
-    disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(onFeedBackFind()));
-    delete ui;
+//    disconnect(ui->btn_find, SIGNAL(clicked(bool)), this, SLOT(onFindThisNameClicked()));
+//    disconnect(ui->btn_exit, SIGNAL(clicked()), this, SLOT(onExitScreenClicked()));
+//    disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(onFeedBackFind()));
+
+//    delete m_clientCommon;
+//    delete ui;
+
+//    m_clientCommon = NULL;
 }
 
 /*
@@ -33,8 +40,36 @@ void AddNewFriend::onFindThisNameClicked()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     QString m_findName = ui->lineEdit_name->text();
-    m_clientCommon->onWritePackage(USER_FindFriend, "", "", m_findName);
+
+    if (m_clientCommon->selectNameFromFriendList(m_findName, m_name)) {
+        QMessageBox::warning(NULL, "Warning", "This user is been your friend");
+    }
+    else {
+        m_clientCommon->onWritePackage(USER_FindFriend, "", "", m_findName);
+    }
     // onFindThisNameClicked   <-Introduction
+}
+
+/*
+ *  onExitScreenClicked
+ *  Introduction: Exit screen of addNewFriend
+ *  ReturnValue: nothing
+ */
+void AddNewFriend::onExitScreenClicked()
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+
+    disconnect(ui->btn_find, SIGNAL(clicked(bool)), this, SLOT(onFindThisNameClicked()));
+    disconnect(ui->btn_exit, SIGNAL(clicked()), this, SLOT(onExitScreenClicked()));
+    disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(onFeedBackFind()));
+
+    delete m_clientCommon;
+    delete ui;
+
+    m_clientCommon = NULL;
+
+    close();
+    // onExitScreenClicked   <-Introduction
 }
 
 void AddNewFriend::onFeedBackFind()

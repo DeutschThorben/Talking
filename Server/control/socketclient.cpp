@@ -167,20 +167,29 @@ void SocketClient::onUserLogin(QString name, QString keyword)
     qDebug("[%s]", __PRETTY_FUNCTION__);
     int ret = 0;
     SocketMessage *m_message = SocketMessage::getInstance();
-    if (m_message->isUserOnline(name)) {
-        // this user is logined already
-        ret = 2;
-    }
-    else {
-        if (m_userList->onLoginUser(name, keyword)) {
-            // user login success
-            ret = 1;
-            emit UserStateChange("Login", name);
+
+    if (m_userList->onSelectSomeNameByName(name)) {
+        if (m_message->isUserOnline(name)) {
+            // this user is logined already
+            ret = 2;
         }
         else {
-            // user login failure
-            ret = 0;
+            if (m_userList->onLoginUser(name, keyword)) {
+                // user login success
+                ret = 1;
+                emit UserStateChange("Login", name);
+                m_message->insertOnlineUser(name, m_socket);
+                m_message->sendStateToAll(name);
+            }
+            else {
+                // user keyword is mistake
+                ret = 0;
+            }
         }
+    }
+    else {
+        // don't have this user
+        ret = 3;
     }
     onWritePackage(USER_Login, "", "", "", ret);
     // onUserLogin   <-Introduction
@@ -237,4 +246,14 @@ QString SocketClient::onCharToQString(const char *b_text)
     QString a_text = QString::fromStdString(b_text);
     return a_text;
     // onCharToQString   <-Introduction
+}
+
+void SocketClient::sendOnlineUserToEvery(QString m_name, QTcpSocket *sockfd)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    Package bag = {EMPTY};
+
+    bag.head = USER_Online;
+    strncpy(bag.name, onQStringChangeToChar(m_name), 20);
+    sockfd->write((char*)(&bag), sizeof(Package));
 }

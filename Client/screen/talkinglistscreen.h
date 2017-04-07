@@ -28,6 +28,7 @@ private slots:
     void onAddNewFriendClicked();
     void onMakeMassesClicked();
     void onTalkingWithOtherClicked(QListWidgetItem*);
+    void onFeedBackFromServer();
 
 protected:
     virtual void closeEvent(QCloseEvent* event);

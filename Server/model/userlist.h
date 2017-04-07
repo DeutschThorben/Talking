@@ -23,8 +23,9 @@ public:
     void onDeleteUser(QString name);
 
     QString onSelectSomeName(int m_ID);
+    bool onSelectSomeNameByName(QString);
+
     int onSelectSomeState(int m_ID);
-    void onSelectSomeState();
     int onMaxID();
 
     int onListBiggerLine();
