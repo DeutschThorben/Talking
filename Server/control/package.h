@@ -12,6 +12,8 @@ enum PackageType {
     USER_TalkingAll,
     USER_FindFriend,
     USER_Online,
+    USER_Online_Back,
+    USER_StateChange,
     USER_Exit
 };
 

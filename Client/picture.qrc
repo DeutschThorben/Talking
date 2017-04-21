@@ -2,5 +2,6 @@
     <qresource prefix="/new/prefix1">
         <file>failure.png</file>
         <file>true.png</file>
+        <file>warning.png</file>
     </qresource>
 </RCC>

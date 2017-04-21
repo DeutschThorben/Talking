@@ -1,9 +1,8 @@
 #include "talking.h"
 #include "ui_talking.h"
 
-Talking::Talking(QTcpSocket *sockfd, QString name, QString otherName, QWidget *parent) :
+Talking::Talking(QString name, QString otherName, QWidget *parent) :
     QWidget(parent),
-    m_socked(sockfd),
     m_name(name),
     m_otherName(otherName),
     ui(new Ui::Talking)
@@ -11,25 +10,19 @@ Talking::Talking(QTcpSocket *sockfd, QString name, QString otherName, QWidget *p
     qDebug("[%s]", __PRETTY_FUNCTION__);
     ui->setupUi(this);
 
-    setAttribute(Qt::WA_DeleteOnClose);
+//    setAttribute(Qt::WA_DeleteOnClose);
 
     m_clientCommon = ClientCommon::getInstance();
-    m_clientCommon->setSocket(m_socked);
-
-    connect(m_socked, SIGNAL(readyRead()), this, SLOT(onFeedBackTalking()));
 
     connect(ui->btn_send, SIGNAL(clicked()), this, SLOT(onSendMessageToServerClicked()));
+    connect(ui->btn_B, SIGNAL(clicked(bool)), this, SLOT(onWordOverStriking()));
+
+    ui->label_name->setText(m_otherName);
 }
 
 Talking::~Talking()
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
-    disconnect(m_socked, SIGNAL(readyRead()), this, SLOT(onFeedBackTalking()));
 
-    disconnect(ui->btn_send, SIGNAL(clicked()), this, SLOT(onSendMessageToServerClicked()));
-
-    delete m_clientCommon;
-    delete ui;
 }
 
 void Talking::onSendMessageToServerClicked()
@@ -49,13 +42,40 @@ void Talking::onSendMessageToServerClicked()
     // onSendMessageToServerClicked   <-Introduction
 }
 
-void Talking::onFeedBackTalking()
+void Talking::MessageFromOther(QString f_message)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-    Package bag = m_clientCommon->onReadPackage();
 
-    if (USER_Talking == bag.head) {
+    ui->textEdit_talkScreen->append(f_message);
+    // MessageFromOther   <-Introduction
+}
 
-    }
-    // onFeedBackTalking   <-Introduction
+void Talking::onWordOverStriking()
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+
+    ui->textEdit_inputScreen->selectAll();
+    // onWordOverStriking   <-Introduction
+}
+
+void Talking::onWordColorChange()
+{
+
+}
+
+/*
+ *  closeEvent
+ *  Introduction: disconnect and clean point
+ *  Formal parameter: [event]
+ *  ReturnValue: nothing
+ */
+void Talking::closeEvent(QCloseEvent *)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+
+    disconnect(ui->btn_send, SIGNAL(clicked()), this, SLOT(onSendMessageToServerClicked()));
+    disconnect(ui->btn_B, SIGNAL(clicked(bool)), this, SLOT(onWordOverStriking()));
+
+    delete ui;
+    // closeEvent   <-Introduction
 }

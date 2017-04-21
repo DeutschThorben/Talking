@@ -15,7 +15,7 @@ public:
     static ClientCommon* getInstance();
 
     Package onReadPackage();
-    void onWritePackage(PackageType head = EMPTY, QString name = "", QString keyword = "", QString otherUser = "", QString talkingInformation = "");
+    void onWritePackage(PackageType head = EMPTY, QString name = "", QString keyword = "", QString otherUser = "", QString talkingInformation = "", int result = 0);
 
     const char* onQStringChangeToChar(QString b_text);
     QString onCharToQString(char *b_text);
@@ -38,7 +38,7 @@ public:
     bool selectNameFromFriendList(QString, QString);
 
     // change user state
-    void changeFriendState(QString, QString);
+    void changeFriendState(QString, QString, int);
 
     // delete a friend
     void deleteAFriendUser(QString, QString);

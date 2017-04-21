@@ -7,9 +7,15 @@
 
 #include "control/package.h"
 
-
 #include "model/userlist.h"
 #include "model/userinformation.h"
+
+enum UserState {
+    Nothing = 0,
+    State_Online,
+    State_Offline,
+    State_Hiding
+};
 
 class SocketClient : public QObject
 {
@@ -21,22 +27,24 @@ public:
     // regist new user
     void onNewUserRegist(QString name, QString keyword);
     // user login
-    void onUserLogin(QString name, QString keyword);
+    void onUserLogin(QString, QString, int);
     // userName whether is same
     void onWhetherIsSame(QString name);
     // user is talking with other user
     void onTalkingWithOther(QString name, QString otherUser, QString talkInformation);
     // user find new friend
-    void onFindNewFriend(QString name);
+    void onFindNewFriend(QString, int);
 
-    void sendOnlineUserToEvery(QString, QTcpSocket*);
+    void onAlreadyOnlineStateBack(QString, QString, int);
+
+    void onUserStateChange(QString, int);
 
 signals:
     void UserStateChange(QString, QString);
-    void UserExit(QString);
 
 public slots:
     void onReadyRead();
+    void sendOnlineUserToEvery(PackageType, QString, QTcpSocket*, int);
 
 private:
     Package onReadPackage();

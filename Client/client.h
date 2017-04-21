@@ -39,7 +39,7 @@ private:
     QTcpSocket *m_socked;
     ClientCommon *m_clientCommon;
     QString m_name;
-    TalkingListScreen *screen_talkingList;
+//    TalkingListScreen *screen_talkingList;
 };
 
 #endif // CLIENT_H

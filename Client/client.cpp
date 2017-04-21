@@ -21,7 +21,6 @@ Client::Client(QWidget *parent) :
 Client::~Client()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-
     disconnect(ui->btn_regist, SIGNAL(clicked(bool)), this, SLOT(onBtnRegistClicked()));
     disconnect(ui->btn_login, SIGNAL(clicked()), this, SLOT(onBtnLoginClicked()));
     disconnect(ui->btn_exit, SIGNAL(clicked()), this, SLOT(onBtnExitClicked()));
@@ -80,7 +79,8 @@ void Client::onReadFromServer()
     if (USER_Login == bag.head) {
         if (1 == bag.result) {
             disconnect(m_socked, SIGNAL(readyRead()), this, SLOT(onReadFromServer()));
-            screen_talkingList = new TalkingListScreen(m_socked, m_name);
+            qDebug("[%s]222222 socket is [%p], name is [%s]", __PRETTY_FUNCTION__, m_socked, m_name.toStdString().c_str());
+            TalkingListScreen *screen_talkingList = new TalkingListScreen(m_socked, m_name);
             screen_talkingList->show();
             close();
         }

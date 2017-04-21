@@ -94,6 +94,7 @@ bool UserList::onIsRegisterUser(UserInformation *user)
  */
 void UserList::onRemoveUser(QString name)
 {
+    qDebug("[%s] name is [%s]", __PRETTY_FUNCTION__, name.toStdString().c_str());
     ControlSqlite::getInstance()->onCreateConnect();
     QSqlQuery query;
 
@@ -157,7 +158,6 @@ bool UserList::onSelectSomeNameByName(QString m_name)
     ControlSqlite::getInstance()->onCreateConnect();
 
     QSqlQuery query;
-    QString name;
 
     query.prepare("select name from user where name = :name");
     query.bindValue(":name", m_name);

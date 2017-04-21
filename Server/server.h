@@ -37,7 +37,6 @@ public slots:
     void onFreshUserList(QString state, QString name);
 
     void onGetListText(QString list_text);
-    void onUserExit(QString);
 
 private:
     Ui::Server *ui;

@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
@@ -27,8 +28,6 @@ QT_BEGIN_NAMESPACE
 class Ui_TalkingListScreen
 {
 public:
-    QLabel *label_name;
-    QLabel *label_icon;
     QWidget *layoutWidget;
     QVBoxLayout *verticalLayout_2;
     QListWidget *list_friend;
@@ -39,21 +38,24 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QPushButton *btn_makeMasses;
     QSpacerItem *horizontalSpacer_2;
+    QWidget *widget;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *label_icon;
+    QVBoxLayout *verticalLayout_3;
+    QSpacerItem *verticalSpacer;
+    QLabel *label_name;
+    QVBoxLayout *verticalLayout_4;
+    QSpacerItem *verticalSpacer_2;
+    QComboBox *comboBox_state;
 
     void setupUi(QWidget *TalkingListScreen)
     {
         if (TalkingListScreen->objectName().isEmpty())
             TalkingListScreen->setObjectName(QStringLiteral("TalkingListScreen"));
-        TalkingListScreen->resize(235, 555);
-        label_name = new QLabel(TalkingListScreen);
-        label_name->setObjectName(QStringLiteral("label_name"));
-        label_name->setGeometry(QRect(90, 10, 81, 21));
-        label_icon = new QLabel(TalkingListScreen);
-        label_icon->setObjectName(QStringLiteral("label_icon"));
-        label_icon->setGeometry(QRect(20, 0, 41, 31));
+        TalkingListScreen->resize(284, 584);
         layoutWidget = new QWidget(TalkingListScreen);
         layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
-        layoutWidget->setGeometry(QRect(20, 40, 191, 501));
+        layoutWidget->setGeometry(QRect(20, 60, 221, 501));
         verticalLayout_2 = new QVBoxLayout(layoutWidget);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
@@ -95,6 +97,45 @@ public:
 
         verticalLayout_2->addLayout(verticalLayout);
 
+        widget = new QWidget(TalkingListScreen);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(20, 10, 221, 41));
+        horizontalLayout_3 = new QHBoxLayout(widget);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
+        label_icon = new QLabel(widget);
+        label_icon->setObjectName(QStringLiteral("label_icon"));
+
+        horizontalLayout_3->addWidget(label_icon);
+
+        verticalLayout_3 = new QVBoxLayout();
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalSpacer = new QSpacerItem(20, 13, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_3->addItem(verticalSpacer);
+
+        label_name = new QLabel(widget);
+        label_name->setObjectName(QStringLiteral("label_name"));
+
+        verticalLayout_3->addWidget(label_name);
+
+
+        horizontalLayout_3->addLayout(verticalLayout_3);
+
+        verticalLayout_4 = new QVBoxLayout();
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        verticalSpacer_2 = new QSpacerItem(20, 17, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_4->addItem(verticalSpacer_2);
+
+        comboBox_state = new QComboBox(widget);
+        comboBox_state->setObjectName(QStringLiteral("comboBox_state"));
+
+        verticalLayout_4->addWidget(comboBox_state);
+
+
+        horizontalLayout_3->addLayout(verticalLayout_4);
+
 
         retranslateUi(TalkingListScreen);
 
@@ -104,10 +145,10 @@ public:
     void retranslateUi(QWidget *TalkingListScreen)
     {
         TalkingListScreen->setWindowTitle(QApplication::translate("TalkingListScreen", "Form", 0));
-        label_name->setText(QString());
-        label_icon->setText(QString());
         btn_addNewFriend->setText(QApplication::translate("TalkingListScreen", "Add new friend", 0));
         btn_makeMasses->setText(QApplication::translate("TalkingListScreen", "Make new masses", 0));
+        label_icon->setText(QString());
+        label_name->setText(QString());
     } // retranslateUi
 
 };

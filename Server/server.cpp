@@ -33,7 +33,6 @@ Server::~Server()
 {
     disconnect(m_server, SIGNAL(newConnection()), this, SLOT(onConnection()));
     disconnect(new_client, SIGNAL(UserStateChange(QString, QString)), this, SLOT(onFreshUserList(QString, QString)));
-    disconnect(new_client, SIGNAL(UserExit(QString)), this, SLOT(onUserExit(QString)));
 
     disconnect(ui->btn_delete, SIGNAL(clicked()), this, SLOT(onBtnDeleteClicked()));
     disconnect(ui->btn_exit, SIGNAL(clicked()), this, SLOT(onBtnExitClicked()));
@@ -47,13 +46,13 @@ void Server::onConnection()
     QTcpSocket *socked = m_server->nextPendingConnection();
     new_client = new SocketClient(socked);
     qDebug("[%s]  socket is [%p]", __PRETTY_FUNCTION__, socked);
-    connect(new_client, SIGNAL(UserStateChange(QString, QString)), this, SLOT(onFreshUserList(QString, QString)));
-    connect(new_client, SIGNAL(UserExit(QString)), this, SLOT(onUserExit(QString)));
+    connect(new_client, SIGNAL(UserStateChange(QString, QString)), this, SLOT(onFreshUserList(QString, QString)), Qt::DirectConnection);
 
     // move new client to one thread
     QThread *thread = new QThread();
     new_client->moveToThread(thread);
     thread->start();
+    // onConnection   <-Introduction
 }
 
 /*
@@ -83,6 +82,11 @@ void Server::onShowAllUser()
     // onShowAllUser   <-Introduction
 }
 
+/*
+ *  onChangeState
+ *  Introduction: user's state change the icon
+ *  ReturnValue: State icon of user
+ */
 QIcon Server::onChangeState(int m_state)
 {
     qDebug("[%s], state is [%d]", __PRETTY_FUNCTION__, m_state);
@@ -97,8 +101,14 @@ QIcon Server::onChangeState(int m_state)
         break;
     }
     return m_icon;
+    // onChangeState   <-Introduction
 }
 
+/*
+ *  onBtnDeleteClicked
+ *  Introduction: delete user from user list
+ *  ReturnValue: nothing
+ */
 void Server::onBtnDeleteClicked()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
@@ -118,6 +128,11 @@ void Server::onBtnDeleteClicked()
     // onBtnDeleteClicked   <-Introduction
 }
 
+/*
+ *  onBtnExitClicked
+ *  Introduction: close server
+ *  ReturnValue: nothing
+ */
 void Server::onBtnExitClicked()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
@@ -125,6 +140,11 @@ void Server::onBtnExitClicked()
     // onBtnExitClicked   <-Introduction
 }
 
+/*
+ *  onGetListText
+ *  Introduction: get state of user name
+ *  ReturnValue: nothing
+ */
 void Server::onGetListText(QString list_text)
 {
     qDebug("[%s] this list name is [%s]", __PRETTY_FUNCTION__, list_text.toStdString().c_str());
@@ -132,11 +152,14 @@ void Server::onGetListText(QString list_text)
     // onBtnDeleteClicked   <-Introduction
 }
 
+/*
+ *  onFreshUserList
+ *  Introduction: fresh user list when someone state has changed
+ *  ReturnValue: nothing
+ */
 void Server::onFreshUserList(QString state, QString name)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
-    onShowAllUser();
-
+    qDebug("[%s] state is [%s]", __PRETTY_FUNCTION__, state.toStdString().c_str());
     QString show_text = "";
     if ("Regist" == state) {
         show_text = show_text + "User: " + name + " is resgis already";
@@ -145,16 +168,10 @@ void Server::onFreshUserList(QString state, QString name)
         show_text = show_text + "User: " + name + " is login already";
     }
     else if ("Exit" == state) {
+        m_userList->onRemoveUser(name);
         show_text = show_text + "User:" + name + " has exit";
     }
     ui->list_work->addItem(new QListWidgetItem(QObject::tr(show_text.toStdString().c_str())));
+        onShowAllUser();
     // onFreshUserList   <-Introduction
-}
-
-void Server::onUserExit(QString m_name)
-{
-    qDebug("[%s]", __PRETTY_FUNCTION__);
-    m_userList->onRemoveUser(m_name);
-
-    onFreshUserList("Exit", m_name);
 }

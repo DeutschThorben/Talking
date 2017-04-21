@@ -5,6 +5,7 @@ TalkingListScreen::TalkingListScreen(QTcpSocket *sockfd, QString name, QWidget *
     QWidget(parent),
     m_socket(sockfd),
     m_name(name),
+    m_state(State_Online),
     ui(new Ui::TalkingListScreen)
 {
     ui->setupUi(this);
@@ -13,12 +14,15 @@ TalkingListScreen::TalkingListScreen(QTcpSocket *sockfd, QString name, QWidget *
     m_clientCommon = ClientCommon::getInstance();
     m_clientCommon->setSocket(sockfd);
 
-    new_addFriend = new AddNewFriend(m_socket, m_name);
+    new_addFriend = new AddNewFriend(m_name);
 
 //    setAttribute(Qt::WA_DeleteOnClose);
 
     // fresh friend list
     onShowAllFriendUser();
+
+    // set state combox
+    addItemInComBox();
 
     // set user name
     ui->label_name->setText(name);
@@ -26,16 +30,16 @@ TalkingListScreen::TalkingListScreen(QTcpSocket *sockfd, QString name, QWidget *
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(onFeedBackFromServer()));
     connect(ui->btn_addNewFriend, SIGNAL(clicked()), this, SLOT(onAddNewFriendClicked()));
     connect(ui->btn_makeMasses, SIGNAL(clicked()), this, SLOT(onMakeMassesClicked()));
+    connect(ui->comboBox_state, SIGNAL(currentIndexChanged(int)), this, SLOT(onSetUserStateClicked(int)));
     connect(ui->list_friend, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onTalkingWithOtherClicked(QListWidgetItem*)));
+    connect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError()));
 }
 
 TalkingListScreen::~TalkingListScreen()
 {
+    qDebug("[%s]", __PRETTY_FUNCTION__);
 
-//    disconnect(ui->btn_addNewFriend, SIGNAL(clicked()), this, SLOT(onAddNewFriendClicked()));
-//    disconnect(ui->btn_makeMasses, SIGNAL(clicked()), this, SLOT(onMakeMassesClicked()));
-//    disconnect(ui->list_friend, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onTalkingWithOtherClicked(QListWidgetItem*)));
-//    disconnect(new_addFriend, SIGNAL(addFriendSuccess()), this, SLOT(onFreshFriendList()));
+    disconnect(m_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onError()));
 
     delete m_clientCommon;
     delete new_addFriend;
@@ -47,7 +51,8 @@ TalkingListScreen::~TalkingListScreen()
 
 /*
  *  onAddNewFriendClicked
- *  Introduction: open screen about add new fr
+ *  Introduction: open screen of AddnewFriend
+ *  Formal parameter: nothing
  *  ReturnValue: nothing
  */
 void TalkingListScreen::onAddNewFriendClicked()
@@ -71,14 +76,29 @@ void TalkingListScreen::onTalkingWithOtherClicked(QListWidgetItem* item)
     qDebug("[%s]", __PRETTY_FUNCTION__);
     QString m_otherName = item->text();
 
-    Talking *new_talking = new Talking(m_socket, m_name, m_otherName);
+    new_talking = new Talking(m_name, m_otherName);
     new_talking->show();
     // onTalkingWithOtherClicked   <-Introduction
 }
 
 /*
+ *  onSetUserStateClicked
+ *  Introduction: choose myself's state
+ *  Formal parameter: nothing
+ *  ReturnValue: nothing
+ */
+void TalkingListScreen::onSetUserStateClicked(int state)
+{
+    qDebug("[%s] state is [%d]", __PRETTY_FUNCTION__, state);
+    m_state = state;
+    sendMyStateToFriend(State_Online);
+    // onSetUserStateClicked   <-Introduction
+}
+
+/*
  *  onShowAllFriendUser
- *  Introduction: show all friend in screen from sqlite
+ *  Introduction: show all friend in screen from table
+ *  Formal parameter: nothing
  *  ReturnValue: nothing
  */
 void TalkingListScreen::onShowAllFriendUser()
@@ -104,7 +124,8 @@ void TalkingListScreen::onShowAllFriendUser()
 
 /*
  *  onChangeFriendState
- *  Introduction: show state of friend
+ *  Introduction: change friend's state from number to icon
+ *  Formal parameter: [friend's state (online-1/offline-0)]
  *  ReturnValue: online (1), offline (0)
  */
 QIcon TalkingListScreen::onChangeFriendState(int state)
@@ -113,10 +134,10 @@ QIcon TalkingListScreen::onChangeFriendState(int state)
     QIcon f_state;
 
     switch (state) {
-    case 0:
+    case State_Offline:
         f_state = QIcon(QObject::tr(":/new/prefix1/failure.png"));
         break;
-    case 1:
+    case State_Online:
         f_state = QIcon(QObject::tr(":/new/prefix1/true.png"));
         break;
     default:
@@ -129,7 +150,8 @@ QIcon TalkingListScreen::onChangeFriendState(int state)
 
 /*
  *  onFreshFriendList
- *  Introduction: Fresh friend list
+ *  Introduction: Fresh friend's list
+ *  Formal parameter: nothing
  *  ReturnValue: nothing
  */
 void TalkingListScreen::onFreshFriendList()
@@ -138,38 +160,112 @@ void TalkingListScreen::onFreshFriendList()
     // onFreshFriendList   <-Introduction
 }
 
-void TalkingListScreen::closeEvent(QCloseEvent *event)
+void TalkingListScreen::closeEvent()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-    m_clientCommon->onWritePackage(USER_Exit, m_name);
-
+    sendMyStateToFriend(State_Offline);
 
     disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(onFeedBackFromServer()));
     disconnect(ui->btn_addNewFriend, SIGNAL(clicked()), this, SLOT(onAddNewFriendClicked()));
     disconnect(ui->btn_makeMasses, SIGNAL(clicked()), this, SLOT(onMakeMassesClicked()));
+    disconnect(ui->comboBox_state, SIGNAL(currentIndexChanged(int)), this, SLOT(onSetUserStateClicked(int)));
     disconnect(ui->list_friend, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onTalkingWithOtherClicked(QListWidgetItem*)));
     disconnect(new_addFriend, SIGNAL(addFriendSuccess()), this, SLOT(onFreshFriendList()));
-
-//    delete m_clientCommon;
-//    delete new_addFriend;
-//    delete ui;
-
-//    m_clientCommon = NULL;
-//    new_addFriend = NULL;
 }
 
 void TalkingListScreen::onFeedBackFromServer()
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     Package bag = m_clientCommon->onReadPackage();
+    qDebug("[%s] head is [%d]", __PRETTY_FUNCTION__, bag.head);
 
+    QString m_name = m_clientCommon->onCharToQString(bag.otherUser);
     QString f_name = m_clientCommon->onCharToQString(bag.name);
-    if (USER_Online == bag.head) {
-        m_clientCommon->changeFriendState(f_name, m_name);
-        qDebug("[%s] 111111", __PRETTY_FUNCTION__);
+    QString f_message = m_clientCommon->onCharToQString(bag.talkingInformation);
+
+    switch (bag.head) {
+    case USER_StateChange:
+        qDebug("[%s] Add new friend [%s]", __PRETTY_FUNCTION__, m_name.toStdString().c_str());
+        onFriendStateChange(m_name, bag.result);
+        break;
+    case USER_FindFriend:
+        new_addFriend->onFindFriendIsSuccess(bag.result);
+        break;
+     case USER_Online_Back:
+        qDebug("[%s] Already online friend is [%s], state is [%d]", __PRETTY_FUNCTION__, f_name.toStdString().c_str(), bag.result);
+        onFriendStateAlreadyOnline(f_name, bag.result);
+        break;
+     case USER_Talking:
+        qDebug("[%s] Message from other [%s]", __PRETTY_FUNCTION__, f_message.toStdString().c_str());
+        new_talking->MessageFromOther(f_message);
+        break;
+    default:
+        break;
     }
-
-
-
     // onFeedBackFromServer   <-Introduction
 }
+
+/*
+ *  onFriendStateChange
+ *  Introduction: Fresh friend list
+ *  Formal parameter: [friend's name, friend's state (online-1/offline-0)]
+ *  ReturnValue: nothing
+ */
+void TalkingListScreen::onFriendStateChange(QString f_name, int state)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    if (m_clientCommon->selectNameFromFriendList(f_name, m_name)) {
+        // change friend state in friend's table
+        m_clientCommon->changeFriendState(f_name, m_name, state);
+        if (State_Online == state) {
+            // send myself state to my friend
+            if (State_Online == m_state) {
+                sendMyStateToFriend(State_Online);
+            }
+        }
+        // fresh friend list
+        onShowAllFriendUser();
+    }
+    // onFriendStateChange   <-Introduction
+}
+
+//void TalkingListScreen::onFriendStateAlreadyOnline(QString f_name, int state)
+//{
+//    qDebug("[%s]", __PRETTY_FUNCTION__);
+//    if (m_clientCommon->selectNameFromFriendList(f_name, m_name)) {
+//        // change friend state in friend's table
+//        m_clientCommon->changeFriendState(f_name, m_name, state);
+//    }
+//    onShowAllFriendUser();
+//    // onFriendStateAlreadyOnline   <-Introduction
+//}
+
+//void TalkingListScreen::onStateChange(int state)
+//{
+//    qDebug("[%s]", __PRETTY_FUNCTION__);
+//    m_clientCommon->onWritePackage(USER_StateChange, m_name, "", "", "", state);
+//    // onStateChange   <-Introduction
+//}
+
+void TalkingListScreen::sendMyStateToFriend(int m_state)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    m_clientCommon->onWritePackage(USER_StateChange, m_name, "", "", "", m_state);
+    // sendMyStateToFriend   <-Introduction
+}
+
+void TalkingListScreen::addItemInComBox()
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    ui->comboBox_state->addItem(QIcon(":/new/prefix1/failure.png"), "offline");
+    ui->comboBox_state->addItem(QIcon(":/new/prefix1/true.png"), "online");
+    ui->comboBox_state->addItem(QIcon(":/new/prefix1/warning.png"), "hiding");
+    // addItemInComBox   <-Introduction
+}
+
+void TalkingListScreen::onError()
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+
+    // onError   <-Introduction
+}
+

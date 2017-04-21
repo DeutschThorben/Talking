@@ -14,6 +14,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTextEdit>
@@ -30,6 +31,8 @@ public:
     QTextEdit *textEdit_inputScreen;
     QPushButton *btn_B;
     QPushButton *btn_I;
+    QLabel *label_icon;
+    QLabel *label_name;
 
     void setupUi(QWidget *Talking)
     {
@@ -54,6 +57,12 @@ public:
         btn_I = new QPushButton(Talking);
         btn_I->setObjectName(QStringLiteral("btn_I"));
         btn_I->setGeometry(QRect(50, 410, 31, 27));
+        label_icon = new QLabel(Talking);
+        label_icon->setObjectName(QStringLiteral("label_icon"));
+        label_icon->setGeometry(QRect(10, 10, 51, 41));
+        label_name = new QLabel(Talking);
+        label_name->setObjectName(QStringLiteral("label_name"));
+        label_name->setGeometry(QRect(60, 10, 81, 21));
 
         retranslateUi(Talking);
 
@@ -66,6 +75,8 @@ public:
         btn_send->setText(QApplication::translate("Talking", "Send", 0));
         btn_B->setText(QApplication::translate("Talking", "B", 0));
         btn_I->setText(QApplication::translate("Talking", "I", 0));
+        label_icon->setText(QString());
+        label_name->setText(QString());
     } // retranslateUi
 
 };

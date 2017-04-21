@@ -16,21 +16,25 @@ class Talking : public QWidget
     Q_OBJECT
 
 public:
-    explicit Talking(QTcpSocket *sockfd, QString name, QString otherName, QWidget *parent = 0);
+    explicit Talking(QString name, QString otherName, QWidget *parent = 0);
     ~Talking();
 
+    void MessageFromOther(QString);
 
 private slots:
-    void onFeedBackTalking();
-
     void onSendMessageToServerClicked();
+    void onWordOverStriking();
+    void onWordColorChange();
+
+protected:
+    virtual void closeEvent(QCloseEvent *);
 
 private:
     Ui::Talking *ui;
     ClientCommon *m_clientCommon;
-    QTcpSocket *m_socked;
     QString m_name;
     QString m_otherName;
+    QString m_message;
 };
 
 #endif // TALKING_H

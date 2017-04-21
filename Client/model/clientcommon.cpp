@@ -41,7 +41,7 @@ Package ClientCommon::onReadPackage()
  *  Instruction: take the package from client to server
  *  ReturnValue: nothing
  */
-void ClientCommon::onWritePackage(PackageType head, QString name, QString keyword, QString otherUser, QString talkingInformation)
+void ClientCommon::onWritePackage(PackageType head, QString name, QString keyword, QString otherUser, QString talkingInformation, int result)
 {
     qDebug("[%s]  socket is [%p]", __PRETTY_FUNCTION__, m_socked);
     Package bag = {EMPTY};
@@ -50,6 +50,7 @@ void ClientCommon::onWritePackage(PackageType head, QString name, QString keywor
     strncpy(bag.keyword, onQStringChangeToChar(keyword), 20);
     strncpy(bag.otherUser, onQStringChangeToChar(otherUser), 20);
     strncpy(bag.talkingInformation, onQStringChangeToChar(talkingInformation), 40);
+    bag.result = result;
 
     qDebug("[%s] bag.head is [%d]", __PRETTY_FUNCTION__, bag.head);
     qDebug("[%s] bag.name is [%s]", __PRETTY_FUNCTION__, bag.name);
@@ -90,6 +91,7 @@ void ClientCommon::setSocket(QTcpSocket *socket)
 {
     qDebug("[%s] socket is [%p]", __PRETTY_FUNCTION__, socket);
     m_socked = socket;
+    qDebug("[%s] 111 socket is [%p]", __PRETTY_FUNCTION__, m_socked);
 }
 
 /*
@@ -192,10 +194,12 @@ int ClientCommon::findAllFriendState(QString f_name, QString m_name)
  */
 bool ClientCommon::selectNameFromFriendList(QString f_name, QString m_name)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
+    qDebug("[%s] friendName is [%s]  myName is [%s]", __PRETTY_FUNCTION__, f_name.toStdString().c_str(), m_name.toStdString().c_str());
     FriendList::getInstance()->onCreateConnect();
     QSqlQuery query;
     QString word = "select name from " + m_name + " where name = :name";
+
+    qDebug("[%s] word is [%s]", __PRETTY_FUNCTION__, word.toStdString().c_str());
 
     query.prepare(word);
     query.bindValue(":name", f_name);
@@ -209,7 +213,7 @@ bool ClientCommon::selectNameFromFriendList(QString f_name, QString m_name)
     // selectNameFromFriendList   <-Introduction
 }
 
-void ClientCommon::changeFriendState(QString f_name, QString m_name)
+void ClientCommon::changeFriendState(QString f_name, QString m_name, int state)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     FriendList::getInstance()->onCreateConnect();
@@ -217,7 +221,7 @@ void ClientCommon::changeFriendState(QString f_name, QString m_name)
     QString word = "update " + m_name + " set state = :state where name = :name";
 
     query.prepare(word);
-    query.bindValue(":state", 1);
+    query.bindValue(":state", state);
     query.bindValue(":name", f_name);
     bool tmp = query.exec();
 

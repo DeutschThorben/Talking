@@ -17,9 +17,10 @@ public:
     void onClientRegist(SocketClient *client);
     bool isUserOnline(QString name);
     void insertOnlineUser(QString, QTcpSocket*);
+    void deleteOnlineUser(QString);
     QTcpSocket* onFindSockedByName(QString name);
 
-    void sendStateToAll(QString);
+    void sendStateToAll(PackageType, QString, int);
 
 signals:
 

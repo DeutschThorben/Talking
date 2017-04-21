@@ -545,7 +545,8 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_picture.cpp
 qrc_picture.cpp: ../Client/picture.qrc \
 		../Client/true.png \
-		../Client/failure.png
+		../Client/failure.png \
+		../Client/warning.png
 	/home/gaofanchao/Qt5.4.2/5.4/gcc_64/bin/rcc -name picture ../Client/picture.qrc -o qrc_picture.cpp
 
 compiler_moc_header_make_all: moc_client.cpp moc_talking.cpp moc_resign.cpp moc_clientcommon.cpp moc_talkinglistscreen.cpp moc_addnewfriend.cpp moc_makemasses.cpp moc_friendlist.cpp
@@ -701,6 +702,8 @@ moc_client.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QIcon \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QCloseEvent \
 		../Client/screen/addnewfriend.h \
 		../Client/screen/makemasses.h \
 		../Client/screen/talking.h \
@@ -1162,6 +1165,8 @@ moc_talkinglistscreen.cpp: ../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QIcon \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QCloseEvent \
 		../Client/screen/addnewfriend.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \
@@ -1647,6 +1652,8 @@ main.o: ../Client/main.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QIcon \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QCloseEvent \
 		../Client/screen/addnewfriend.h \
 		../Client/screen/makemasses.h \
 		../Client/screen/talking.h \
@@ -1810,6 +1817,8 @@ client.o: ../Client/client.cpp ../Client/client.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qstyle.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QIcon \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QCloseEvent \
 		../Client/screen/addnewfriend.h \
 		../Client/screen/makemasses.h \
 		../Client/screen/talking.h \
@@ -1993,6 +2002,8 @@ talking.o: ../Client/screen/talking.cpp ../Client/screen/talking.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QLabel \
+		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlabel.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QListWidget \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistwidget.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qlistview.h \
@@ -2387,6 +2398,8 @@ talkinglistscreen.o: ../Client/screen/talkinglistscreen.cpp ../Client/screen/tal
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabbar.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qtabwidget.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qrubberband.h \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QIcon \
+		../../Qt5.4.2/5.4/gcc_64/include/QtGui/QCloseEvent \
 		../Client/screen/addnewfriend.h \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/QMessageBox \
 		../../Qt5.4.2/5.4/gcc_64/include/QtWidgets/qmessagebox.h \

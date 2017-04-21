@@ -5,7 +5,7 @@ SocketClient::SocketClient(QTcpSocket *socket, QObject *parent) : QObject(parent
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     m_userList = new UserList();
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()), Qt::DirectConnection);
 }
 
 SocketClient::~SocketClient()
@@ -24,6 +24,8 @@ void SocketClient::onReadyRead()
     QString m_otherUser = onCharToQString(bag.otherUser);
     QString m_talkInformation = onCharToQString(bag.talkingInformation);
 
+    SocketMessage *m_message = SocketMessage::getInstance();
+
     switch (bag.head) {
     case USER_Regist:
         qDebug("[%s] Client is registing", __PRETTY_FUNCTION__);
@@ -31,7 +33,7 @@ void SocketClient::onReadyRead()
         break;
     case USER_Login:
         qDebug("[%s] Client is loading", __PRETTY_FUNCTION__);
-        onUserLogin(m_name, m_keyword);
+        onUserLogin(m_name, m_keyword, bag.result);
         break;
     case USER_Regist_IsSameName:
         qDebug("[%s] ", __PRETTY_FUNCTION__);
@@ -43,12 +45,22 @@ void SocketClient::onReadyRead()
         break;
     case USER_FindFriend:
         qDebug("[%s] Client add new friend", __PRETTY_FUNCTION__);
-        onFindNewFriend(m_otherUser);
+        onFindNewFriend(m_otherUser, bag.result);
         break;
-    case USER_Exit:
-        qDebug("[%s] Client exit", __PRETTY_FUNCTION__);
-        emit UserExit(m_name);
+    case USER_Online_Back:
+        qDebug("[%s] Client is online already back", __PRETTY_FUNCTION__);
+        onAlreadyOnlineStateBack(m_name, m_otherUser, bag.result);
         break;
+    case USER_StateChange:
+        qDebug("[%s] Client's state change", __PRETTY_FUNCTION__);
+        onUserStateChange(m_name, bag.result);
+        break;
+//    case USER_Exit:
+//        qDebug("[%s] Client exit", __PRETTY_FUNCTION__);
+//        m_message->sendStateToAll(USER_Exit, m_name, 0);
+//        m_message->deleteOnlineUser(m_name);
+//        emit UserStateChange("Exit", m_name);
+//        break;
     default:
         break;
     }
@@ -94,7 +106,7 @@ void SocketClient::onWritePackage(PackageType head, QString name, QString otherU
     qDebug("[%s]result is [%d]", __PRETTY_FUNCTION__, bag.result);
 
     SocketMessage *m_message = SocketMessage::getInstance();
-    QTcpSocket *sockfd = m_message->onFindSockedByName(name);
+    QTcpSocket *sockfd = m_message->onFindSockedByName(otherUser);
 
     if ((NULL != sockfd) && (m_socket != sockfd)) {
         // talking with other
@@ -162,7 +174,7 @@ void SocketClient::onWhetherIsSame(QString name)
  *  Introduction: client user login ( USER_Login )
  *  ReturnValue: login success (1), login failure (0), user login already (2)
  */
-void SocketClient::onUserLogin(QString name, QString keyword)
+void SocketClient::onUserLogin(QString name, QString keyword, int state)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     int ret = 0;
@@ -178,8 +190,9 @@ void SocketClient::onUserLogin(QString name, QString keyword)
                 // user login success
                 ret = 1;
                 emit UserStateChange("Login", name);
+                onUserStateChange(name, state);
+                qDebug("[%s] 1111 name is [%s], socket is [%p]", __PRETTY_FUNCTION__, name.toStdString().c_str(), m_socket);
                 m_message->insertOnlineUser(name, m_socket);
-                m_message->sendStateToAll(name);
             }
             else {
                 // user keyword is mistake
@@ -195,6 +208,29 @@ void SocketClient::onUserLogin(QString name, QString keyword)
     // onUserLogin   <-Introduction
 }
 
+void SocketClient::onAlreadyOnlineStateBack(QString m_name, QString f_name, int state)
+{
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+    SocketMessage *m_message = SocketMessage::getInstance();
+//    QMap<QString, QTcpSocket*>::const_iterator iter;
+//    m_message->sendStateToAll(USER_Online_Back, name);
+
+    onWritePackage(USER_Online_Back, m_name, f_name, "", state);
+    // onAlreadyOnlineStateBack   <-Introduction
+}
+
+void SocketClient::onUserStateChange(QString m_name, int state)
+{
+    qDebug("[%s] state is [%d]", __PRETTY_FUNCTION__, state);
+    SocketMessage *m_message = SocketMessage::getInstance();
+    m_message->sendStateToAll(USER_StateChange, m_name, state);
+
+    if (0 == state) {
+        m_message->deleteOnlineUser(m_name);
+    }
+    // onUserStateChange   <-Introduction
+}
+
 void SocketClient::onTalkingWithOther(QString name, QString otherUser, QString talkInformation)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
@@ -206,15 +242,27 @@ void SocketClient::onTalkingWithOther(QString name, QString otherUser, QString t
 /*
  *  onFindNewFriend
  *  Introduction: the name whether is exist in user list ( USER_FindFriend )
- *  ReturnValue: the name is exist (1), not exist (0)
+ *  ReturnValue: has this name and online (2), has this name and offline (1), not this user (0)
  */
-void SocketClient::onFindNewFriend(QString name)
+void SocketClient::onFindNewFriend(QString name, int result)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
+    SocketMessage *m_message = SocketMessage::getInstance();
     int ret = 0;
     UserInformation *user_information = new UserInformation(name, "");
+
+    if (4 == result) {
+        onWritePackage(USER_FindFriend, m_name, );
+    }
+
+
     if (m_userList->onIsRegisterUser(user_information)) {
-        ret = 1;
+        if (m_message->isUserOnline(name)) {
+            ret = 2;
+        }
+        else {
+            ret = 1;
+        }
     }
     else {
         ret = 0;
@@ -248,12 +296,15 @@ QString SocketClient::onCharToQString(const char *b_text)
     // onCharToQString   <-Introduction
 }
 
-void SocketClient::sendOnlineUserToEvery(QString m_name, QTcpSocket *sockfd)
+void SocketClient::sendOnlineUserToEvery(PackageType head, QString m_name, QTcpSocket* sockfd, int state)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
+    qDebug("[%s] name is [%s]", __PRETTY_FUNCTION__, m_name.toStdString().c_str());
     Package bag = {EMPTY};
-
-    bag.head = USER_Online;
-    strncpy(bag.name, onQStringChangeToChar(m_name), 20);
+    qDebug("[%s] 1111111 socket is [%p]", __PRETTY_FUNCTION__, sockfd);
+    bag.head = head;
+    bag.result = state;
+    strncpy(bag.otherUser, onQStringChangeToChar(m_name), 20);
+    qDebug("[%s] 33333 otherName is [%s]", __PRETTY_FUNCTION__, bag.otherUser);
     sockfd->write((char*)(&bag), sizeof(Package));
+    qDebug("[%s] 44444 head is [%d]", __PRETTY_FUNCTION__, bag.head);
 }
