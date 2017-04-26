@@ -63,6 +63,8 @@ signals:
 public slots:
     void onPackageRead();
 
+    void onFriendListToEveryone(QString, QTcpSocket*);
+
 private:
     QTcpSocket *m_socket;
 

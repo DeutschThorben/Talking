@@ -14,8 +14,9 @@ public:
 
 signals:
 
-public slots:
+private:
     explicit ControlFrientTable(QObject *parent = 0);
+
     static ControlFrientTable *instance;
     QSqlDatabase db;
 };

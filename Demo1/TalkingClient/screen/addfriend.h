@@ -15,13 +15,12 @@ class AddFriend : public QWidget
     Q_OBJECT
 
 public:
-    explicit AddFriend(QString name, QWidget *parent = 0);
+    explicit AddFriend(ClientCommon *clientCommon, QString name, QWidget *parent = 0);
     ~AddFriend();
 
     void resultOfFindFriend(QString, int);
 
 signals:
-    void addFriendSuccess();
 
 private slots:
     void onBtnFindClicked();
@@ -32,6 +31,8 @@ private:
     Ui::AddFriend *ui;
     QString m_name;
     ClientCommon *m_clientCommon;
+
+    void whetherAgreeToFriend(QString);
 
     virtual void closeEvent();
 };

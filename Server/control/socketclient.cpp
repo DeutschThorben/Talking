@@ -252,7 +252,7 @@ void SocketClient::onFindNewFriend(QString name, int result)
     UserInformation *user_information = new UserInformation(name, "");
 
     if (4 == result) {
-        onWritePackage(USER_FindFriend, m_name, );
+//        onWritePackage(USER_FindFriend, m_name, );
     }
 
 

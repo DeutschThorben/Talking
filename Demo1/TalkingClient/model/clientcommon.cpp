@@ -17,6 +17,7 @@ Package ClientCommon::onReadPackageFromServer()
     u_socket->read((char*)(&bag), sizeof(Package));
 
     qDebug("[%s] bag.head is [%d]", __PRETTY_FUNCTION__, bag.head);
+    qDebug("[%s] bag.result is [%d]", __PRETTY_FUNCTION__, bag.result);
     qDebug("[%s] bag.name is [%s]", __PRETTY_FUNCTION__, bag.name);
     qDebug("[%s] bag.keyword is [%s]", __PRETTY_FUNCTION__, bag.keyword);
     qDebug("[%s] bag.otherUser is [%s]", __PRETTY_FUNCTION__, bag.otherUser);
@@ -34,7 +35,7 @@ Package ClientCommon::onReadPackageFromServer()
  */
 void ClientCommon::onWritePackageToServer(PackageType head, int result, QString name, QString keyword, QString otherUser, QString message)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
+    qDebug("[%s] socket is [%p]", __PRETTY_FUNCTION__, u_socket);
     Package bag = {EMPTY};
     bag.head = head;
     bag.result = result;
@@ -56,8 +57,22 @@ void ClientCommon::onWritePackageToServer(PackageType head, int result, QString 
  */
 void ClientCommon::onSetSocket(QTcpSocket *sockfd)
 {
+    qDebug("[%s] socket is [%p]", __PRETTY_FUNCTION__, sockfd);
     u_socket = sockfd;
     // onSetSocket   <-Introduction
+}
+
+/*
+ * onGetSocket
+ * Instruction: get socket to client
+ * Formal parameter: nothing
+ * ReturnValue: socket of client
+ */
+QTcpSocket* ClientCommon::onGetSocket()
+{
+    qDebug("[%s] socket is [%p]", __PRETTY_FUNCTION__, u_socket);
+    return u_socket;
+    // onGetSocket   <-Introduction
 }
 
 /*

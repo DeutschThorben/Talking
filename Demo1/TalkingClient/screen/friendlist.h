@@ -19,7 +19,7 @@ class FriendList : public QWidget
     Q_OBJECT
 
 public:
-    explicit FriendList(QTcpSocket *sockfd, QString name, int state, QWidget *parent = 0);
+    explicit FriendList(ClientCommon* clientCommon, QString name, int state, QWidget *parent = 0);
     ~FriendList();
 
 private slots:
@@ -37,10 +37,6 @@ private slots:
     // message from server
     void onFeedBackFromServer();
 
-    // fresh friend list
-    void onFreshFriendList();
-
-
 
 private:
     QTcpSocket *m_socket;
@@ -55,7 +51,7 @@ private:
 
 
 
-    void showAllFriendOnList();
+    void showAllFriendOnList(ShowFriendList);
     QIcon changeFriendState(int);
     void addItemInCombox();
 

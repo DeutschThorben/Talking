@@ -101,12 +101,14 @@ void TalkingClient::onReadFromServer()
         QMessageBox::critical(NULL, "Error", "Not exist this user !", QMessageBox::Ok);
         break;
     case result_Success:
+    {
         // Login success
         m_clientCommon->onSetSocket(m_socket);
-        FriendList *screen_friendList = new FriendList(m_socket, m_name, m_state);
+        FriendList *screen_friendList = new FriendList(m_clientCommon, m_name, m_state);
         screen_friendList->show();
         close();
         break;
+    }
     default:
         break;
     }
@@ -136,9 +138,9 @@ void TalkingClient::onChooseLoginState(int state)
 void TalkingClient::addItemCombox()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-    ui->comboBox->addItem(QIcon(":/new/prefix1/failure.png"), "offline");
-    ui->comboBox->addItem(QIcon(":/new/prefix1/true.png"), "online");
-    ui->comboBox->addItem(QIcon(":/new/prefix1/warning.png"), "hiding");
+    ui->comboBox->addItem(QIcon(":/new/prefix1/picture/offline.png"), "offline");
+    ui->comboBox->addItem(QIcon(":/new/prefix1/picture/online.png"), "online");
+    ui->comboBox->addItem(QIcon(":/new/prefix1/picture/hiding.png"), "hiding");
     // addItemInComBox   <-Introduction
 }
 

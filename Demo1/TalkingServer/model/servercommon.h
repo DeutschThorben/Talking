@@ -15,7 +15,7 @@ public:
     explicit ServerCommon(QObject *parent = 0);
 
     // read and write
-    void onWriteToClient(PackageType head = 0, int result = 0, QString name = "", QString keyword = "", QString otherUser = "", QString message = "");
+    void onWriteToClient(PackageType head = EMPTY, int result = 0, QString name = "", QString keyword = "", QString otherUser = "", QString message = "");
     Package onReadPackageFromClient();
 
     // Type change

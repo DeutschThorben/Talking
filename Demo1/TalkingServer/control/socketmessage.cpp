@@ -96,7 +96,7 @@ void SocketMessage::onChangeState(QString n_name, int n_state)
 }
 
 /*
- * onSelectStateFromName
+ * onSelectStateByName
  * Introduction: get some user's state
  * Formal parameter: [select name]
  * ReturnValue: this user's state
@@ -112,7 +112,7 @@ int SocketMessage::onSelectStateByName(QString n_name)
         }
     }
     return state_offline;
-    // onSelectStateFromName   <-Introduction
+    // onSelectStateByName   <-Introduction
 }
 
 /*

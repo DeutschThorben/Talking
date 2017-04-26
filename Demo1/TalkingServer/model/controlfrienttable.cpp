@@ -4,7 +4,12 @@ ControlFrientTable* ControlFrientTable::instance = NULL;
 
 ControlFrientTable::ControlFrientTable(QObject *parent) : QObject(parent)
 {
-    db = QSqlDatabase::addDatabase("QSQLITE");
+    if (db.contains("qt_sql_default_connection")) {
+        db.database("qt_sql_default_connection");
+    }
+    else {
+        db = QSqlDatabase::addDatabase("QSQLITE");
+    }
 }
 
 ControlFrientTable* ControlFrientTable::getInstance()
@@ -18,7 +23,7 @@ ControlFrientTable* ControlFrientTable::getInstance()
 
 void ControlFrientTable::onCreateConnect()
 {
-    db.setDatabaseName("../Demo1/TalkingServer/friend.db");
+    db.setDatabaseName("../TalkingServer/friend.db");
     db.open();
     // onCreateConnect   <-Introduction
 }
@@ -28,6 +33,6 @@ void ControlFrientTable::onDestroyConnect()
     if (db.isOpen()) {
         db.close();
     }
-    db.removeDatabase("../Demo1/TalkingServer/user.db");
+    db.removeDatabase("../TalkingServer/friend.db");
     // onDestroyConnect   <-Introduction
 }

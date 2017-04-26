@@ -81,6 +81,7 @@ void FriendCommon::onCreateFriendList(QString m_name)
   */
  int FriendCommon::onGetMaxID(QString name)
  {
+     qDebug("[%s] select_name is [%s]", __PRETTY_FUNCTION__, name.toStdString().c_str());
      ControlFrientTable::getInstance()->onCreateConnect();
      int maxValue = 0;
      QString word = "select max(ID) as maxID from " + name;
@@ -90,6 +91,7 @@ void FriendCommon::onCreateFriendList(QString m_name)
          maxValue = query.value(0).toInt();
      }
      ControlFrientTable::getInstance()->onDestroyConnect();
+     qDebug("[%s] maxValue is [%s]", __PRETTY_FUNCTION__, maxValue);
      return maxValue;
      // onGetMaxID   <-Introduction
  }

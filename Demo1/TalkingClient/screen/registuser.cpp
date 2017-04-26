@@ -55,7 +55,7 @@ void RegistUser::onFeedBackRegist()
             QMessageBox message(QMessageBox::NoIcon, "Message", "Regist success", QMessageBox::Ok);
             if (QMessageBox::Ok == message.exec()) {
                 // Create friend list in server
-                m_clientCommon->onWritePackageToServer(User_CreateFriendList, 0, ui->lineEdit_name);
+                m_clientCommon->onWritePackageToServer(User_CreateFriendList, 0, ui->lineEdit_name->text());
                 close();
             }
         }
@@ -93,7 +93,7 @@ void RegistUser::onOKClicked()
         }
         else {
             qDebug("[%s] take the bag to server", __PRETTY_FUNCTION__);
-            m_clientCommon->onWritePackageToServer(User_Regist, m_name, m_keyword);
+            m_clientCommon->onWritePackageToServer(User_Regist, 0, m_name, m_keyword);
         }
     }
     // onOKClicked   <-Introduction
@@ -130,7 +130,7 @@ void RegistUser::onLabelNameChange()
 
     if (m_name.length() == 0) {
         ui->label_name->setText("The name can't is empty");
-        QPixmap img(":/new/prefix1/failure.png");
+        QPixmap img(":/new/prefix1/picture/offline.png");
         QPixmap fitPixmap = img.scaled(ui->icon_name->width(), ui->icon_name->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->icon_name->setPixmap(QPixmap(fitPixmap));
         ui->btn_ok->setEnabled(false);
@@ -154,22 +154,22 @@ void RegistUser::onLabelKWChange()
     QString m_KW = ui->lineEdit_KW->text();
 
     if ((m_KW.length() < 6) || (m_KW.length() > 6)) {
-        ui->label_keyword->setText("Keyword must has 6 charaters");
-        QPixmap img(":/new/prefix1/failure.png");
+        ui->label_KW->setText("Keyword must has 6 charaters");
+        QPixmap img(":/new/prefix1/picture/offline.png");
         QPixmap fitPixmap = img.scaled(ui->icon_KW->width(), ui->icon_KW->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->icon_KW->setPixmap(QPixmap(fitPixmap));
         ui->btn_ok->setEnabled(false);
     }
     else if (m_KW.length() == 6) {
-        ui->label_keyword->setText("");
-        QPixmap img(":/new/prefix1/true.png");
+        ui->label_KW->setText("");
+        QPixmap img(":/new/prefix1/picture/online.png");
         QPixmap fitPixmap = img.scaled(ui->icon_KW->width(), ui->icon_KW->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->icon_KW->setPixmap(QPixmap(fitPixmap));
         ui->btn_ok->setEnabled(true);
     }
     else if (m_KW.length() == 0) {
-        ui->label_keyword->setText("Keyword can't is empty");
-        QPixmap img(":/new/prefix1/failure.png");
+        ui->label_KW->setText("Keyword can't is empty");
+        QPixmap img(":/new/prefix1/picture/offline.png");
         QPixmap fitPixmap = img.scaled(ui->icon_KW->width(), ui->icon_KW->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->icon_KW->setPixmap(QPixmap(fitPixmap));
         ui->btn_ok->setEnabled(false);
@@ -191,27 +191,19 @@ void RegistUser::onLabelKWAChange()
     QString m_KW = ui->lineEdit_KW->text();
     QString m_KWA = ui->lineEdit_KWA->text();
 
-    if (m_KWA.length() == 0) {
-        ui->lineEdit_KWA->setVisible(false);
-        ui->icon_KWA->setVisible(false);
+    if (m_KW == m_KWA) {
+        ui->label_KWA->setText("");
+        QPixmap img(":/new/prefix1/picture/online.png");
+        QPixmap fitPixmap = img.scaled(ui->icon_KWA->width(), ui->icon_KWA->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        ui->icon_KWA->setPixmap(QPixmap(fitPixmap));
+        ui->btn_ok->setEnabled(true);
     }
     else {
-        ui->lineEdit_KWA->setVisible(true);
-        ui->icon_KWA->setVisible(true);
-        if (m_KW == m_KWA) {
-            ui->label_KWA->setText("");
-            QPixmap img(":/new/prefix1/true.png");
-            QPixmap fitPixmap = img.scaled(ui->icon_KWA->width(), ui->icon_KWA->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            ui->icon_KWA->setPixmap(QPixmap(fitPixmap));
-            ui->btn_ok->setEnabled(true);
-        }
-        else {
-            ui->label_KWA->setText("Twice keyword is not same");
-            QPixmap img(":/new/prefix1/failure.png");
-            QPixmap fitPixmap = img.scaled(ui->icon_KWA->width(), ui->icon_KWA->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            ui->icon_KWA->setPixmap(QPixmap(fitPixmap));
-            ui->btn_ok->setEnabled(false);
-        }
+        ui->label_KWA->setText("Twice keyword is not same");
+        QPixmap img(":/new/prefix1/picture/offline.png");
+        QPixmap fitPixmap = img.scaled(ui->icon_KWA->width(), ui->icon_KWA->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        ui->icon_KWA->setPixmap(QPixmap(fitPixmap));
+        ui->btn_ok->setEnabled(false);
     }
     // onLabelKWAChange   <-Introduction
 }
@@ -227,14 +219,14 @@ void RegistUser::onLabelNameResult(int result)
     qDebug("[%s] The result is [%d] (has name-2/not find-3)", __PRETTY_FUNCTION__, result);
     if (result_HasName == result) {
         ui->label_name->setText("This name has been used");
-        QPixmap img(":/new/prefix1/failure.png");
+        QPixmap img(":/new/prefix1/picture/offline.png");
         QPixmap fitPixmap = img.scaled(ui->icon_name->width(), ui->icon_name->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->icon_name->setPixmap(QPixmap(fitPixmap));
         ui->btn_ok->setEnabled(false);
     }
     else if (result_NotFindName == result) {
         ui->label_name->setText("");
-        QPixmap img(":/new/prefix1/true.png");
+        QPixmap img(":/new/prefix1/picture/online.png");
         QPixmap fitPixmap = img.scaled(ui->icon_name->width(), ui->icon_name->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         ui->icon_name->setPixmap(QPixmap(fitPixmap));
         ui->btn_ok->setEnabled(true);

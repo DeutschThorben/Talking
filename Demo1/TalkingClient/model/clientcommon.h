@@ -34,6 +34,7 @@ public:
     void onWritePackageToServer(PackageType head = EMPTY, int result = 0, QString name = "", QString keyword = "", QString otherUser = "", QString message = "");
 
     void onSetSocket(QTcpSocket*);
+    QTcpSocket* onGetSocket();
 
     const char* onQStringChangeToChar(QString b_text);
     QString onCharToQString(char *b_text);

@@ -87,7 +87,7 @@ void TalkingServer::onDeleteUserClicked()
     QMessageBox::StandardButton message = QMessageBox::question(NULL, "Please make sure", word, QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
     if (QMessageBox::Yes == message) {
         m_tableCommon->onDeleteUser(user_name);
-        QMessageBox message(NULL, "Result", "Delete success", QMessageBox::Ok);
+        QMessageBox message(QMessageBox::NoIcon, "Result", "Delete success", QMessageBox::Ok);
         message.exec();
     }
 
@@ -152,9 +152,9 @@ void TalkingServer::showAllUser()
     for (int ID = 1; ID <= table_maxID; ID++) {
         a_name = m_tableCommon->onSelectNameForID(ID);
         if ("" != a_name) {
-            a_state = m_socketMessage->onSelectStateFromName(a_name);
+            a_state = m_socketMessage->onSelectStateByName(a_name);
             qDebug("[%s], name is [%s] state is [%d]", __PRETTY_FUNCTION__,a_name.toStdString().c_str(), a_state);
-            QListWidgetItem *m_userItem = new QListWidgetItem(m_socketMessage->onChangeStateToIcon(a_state), QObject::tr(a_name));
+            QListWidgetItem *m_userItem = new QListWidgetItem(m_socketMessage->onChangeStateToIcon(a_state), QObject::tr(a_name.toStdString().c_str()));
             ui->list_user->addItem(m_userItem);
         }
     }
@@ -181,7 +181,7 @@ void TalkingServer::onUserStateChange(QString a_name, QString a_state)
         word = word + "User [ " + a_name + " ] is exit already";
     }
 
-    ui->list_message->addItem(new QListWidgetItem(QObject::tr(word)));
+    ui->list_message->addItem(new QListWidgetItem(QObject::tr(word.toStdString().c_str())));
     showAllUser();
     // onUserStateChange   <-Introduction
 }
@@ -196,6 +196,13 @@ void TalkingServer::onUserAddOther(QString m_name, QString f_name)
 {
     qDebug("[%s] ", __PRETTY_FUNCTION__);
     QString word = "User [" + f_name + "] add the user [" + m_name + "] with friend";
-    ui->list_message->addItem(new QListWidgetItem(QObject::tr(word)));
+    ui->list_message->addItem(new QListWidgetItem(QObject::tr(word.toStdString().c_str())));
     // onUserAddOther   <-Introduction
+}
+
+void TalkingServer::onUserChangeState(QString u_name, int u_state)
+{
+    qDebug("[%s] ", __PRETTY_FUNCTION__);
+    showAllUser();
+    // onUserChangeState   <-Introduction
 }

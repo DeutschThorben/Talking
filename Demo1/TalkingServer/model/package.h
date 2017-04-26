@@ -25,8 +25,9 @@ struct Package {
 
 struct ShowFriendList {
     PackageType head;
-    char f_name[20];
+    char f_name[20][20];
     int f_state[20];
+    int i;
 };
 
 #endif // PACKAGE

@@ -9,12 +9,25 @@ ClientControl::ClientControl(QTcpSocket *sockfd, QObject *parent)
     m_friendCommon = new FriendCommon();
     m_socketMessage = new SocketMessage();
 
+    m_serverCommon->onSetMySocket(m_socket);
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(onPackageRead()));
+    connect(m_socketMessage, SIGNAL(onSendToEveryone(QString,QTcpSocket*)), this, SLOT(onFriendListToEveryone(QString,QTcpSocket*)));
 }
 
 ClientControl::~ClientControl()
 {
+//    disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(onPackageRead()));
+//    disconnect(m_socketMessage, SIGNAL(onSendToEveryone(QString,QTcpSocket*)), this, SLOT(onFriendListToEveryone(QString,QTcpSocket*)));
 
+    delete m_serverCommon;
+    delete m_tableCommon;
+    delete m_friendCommon;
+    delete m_socketMessage;
+
+    m_serverCommon = NULL;
+    m_tableCommon = NULL;
+    m_friendCommon = NULL;
+    m_socketMessage = NULL;
 }
 
 /*
@@ -102,6 +115,7 @@ void ClientControl::onUserLoading(QString login_name, QString login_keyword, int
         if (m_tableCommon->onIsCorrectKeywordLogin(login_name, login_keyword)) {
             // judge the user whether is loading
             int tmp = m_socketMessage->onSelectStateByName(login_name);
+            qDebug("[%s] tmp is [%d]", __PRETTY_FUNCTION__, tmp);
             if (state_offline == tmp) {
                 // login success
                 result = result_Success;
@@ -115,10 +129,8 @@ void ClientControl::onUserLoading(QString login_name, QString login_keyword, int
 
                 // send friend list to client
                 onGetFriendList(login_name, m_socket);
-                //                // send the user's state to him friend   ????????????????????????
-                //                if (state_online == login_state) {
-                //                    onSendMyStateToFriend(login_name, login_state);
-                //                }
+                // inform everyone to get friend list
+                onSendMyStateToFriend(login_name, login_state);
             }
             else {
                 result = result_alreadyLoading;
@@ -190,6 +202,7 @@ void ClientControl::onFindNewFriend(QString m_name, QString find_name, int resul
     else if (result_AgreeFriend == result) {
         ret = result_AgreeFriend;
         m_friendCommon->onAddNewFriend(m_name, find_name);
+        onGetFriendList(m_name, m_socket);
         emit onUserFriendAdd(m_name, find_name);
     }
     else if (result_Failure == result) {
@@ -220,6 +233,12 @@ void ClientControl::onCreateAFriendList(QString m_name)
     // onCreateAFriendList   <-Introduction
 }
 
+/*
+ * onClientStateChange
+ * Introduction: change state for state_map and online_map
+ * Formal parameter: [change state name, change state]
+ * ReturnValue: nothing
+ */
 void ClientControl::onClientStateChange(QString m_name, int m_state)
 {
     qDebug("[%s] ", __PRETTY_FUNCTION__);
@@ -231,10 +250,16 @@ void ClientControl::onClientStateChange(QString m_name, int m_state)
     else {
         m_socketMessage->onChangeState(m_name, m_state);
     }
-    //    onSendMyStateToFriend(m_name, m_state);
+    onSendMyStateToFriend(m_name, m_state);
     // onClientStateChange   <-Introduction
 }
 
+/*
+ * onGetFriendList
+ * Introduction: pack friend's name and them state and send to him
+ * Formal parameter: [someone name, his socket]
+ * ReturnValue: nothing
+ */
 void ClientControl::onGetFriendList(QString m_name, QTcpSocket* sockfd)
 {
     qDebug("[%s] ", __PRETTY_FUNCTION__);
@@ -242,31 +267,41 @@ void ClientControl::onGetFriendList(QString m_name, QTcpSocket* sockfd)
     QString f_name;
     int f_state = 0;
     int i = 0;
-    int j = 0;
 
     int maxID = m_friendCommon->onGetMaxID(m_name);
-    for (int ID = 1; ID <= maxID; ID++) {
-        f_name = m_friendCommon->onSelectNameForID(m_name, ID);
-        qDebug("[%s] name is [%s]", __PRETTY_FUNCTION__, f_name.toStdString().c_str());
-        if ("" == f_name) {
-            // this friend has been delete
-            continue;
+    if (maxID > 0) {
+        for (int ID = 1; ID <= maxID; ID++) {
+            f_name = m_friendCommon->onSelectNameForID(m_name, ID);
+            qDebug("[%s] name is [%s]", __PRETTY_FUNCTION__, f_name.toStdString().c_str());
+            if ("" == f_name) {
+                // this friend has been delete
+                continue;
+            }
+
+            f_state = m_socketMessage->onSelectStateByName(f_name);
+            qDebug("[%s] state is [%d]", __PRETTY_FUNCTION__, f_state);
+            if (state_hiding == f_state) {
+                f_state = state_offline;
+            }
+
+            strcpy(bag.f_name[i], f_name.toStdString().c_str());
+            qDebug("[%s] 111 name is [%s]", __PRETTY_FUNCTION__, bag.f_name[i][20]);
+            bag.f_state[i] = f_state;
+            qDebug("[%s] state is [%d]", __PRETTY_FUNCTION__, bag.f_state[i]);
+            i++;
         }
 
-        f_state = m_socketMessage->onSelectStateByName(f_name);
-        qDebug("[%s] state is [%d]", __PRETTY_FUNCTION__, f_state);
-        if (state_hiding == f_state) {
-            f_state = state_offline;
-        }
 
-        bag.f_name[i] = m_serverCommon->onQStringToChar(f_name);
-        qDebug("[%s] 111 name is [%s]", __PRETTY_FUNCTION__, bag.f_name[i]);
-        bag.f_state[j] = f_state;
-        qDebug("[%s] state is [%d]", __PRETTY_FUNCTION__, bag.f_state[j]);
-        i++;
-        j++;
+        bag.head = User_FriendList;
+        bag.i = i;
+        sockfd->write((char*)(&bag), sizeof(ShowFriendList));
     }
-    bag.head = User_FriendList;
-    sockfd->write((char*)(&bag), sizeof(ShowFriendList));
     // onGetFriendList   <-Introduction
+}
+
+void ClientControl::onFriendListToEveryone(QString f_name, QTcpSocket *f_socket)
+{
+    qDebug("[%s] name is [%s], socket is [%p]", __PRETTY_FUNCTION__, f_name.toStdString().c_str(), f_socket);
+    onGetFriendList(f_name, f_socket);
+    // onFriendListToEveryone   <-Introduction
 }

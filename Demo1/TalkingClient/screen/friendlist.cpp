@@ -1,17 +1,18 @@
 #include "friendlist.h"
 #include "ui_friendlist.h"
 
-FriendList::FriendList(QTcpSocket *sockfd, QString name, int state, QWidget *parent) :
+FriendList::FriendList(ClientCommon* clientCommon, QString name, int state, QWidget *parent) :
     QWidget(parent),
-    m_socket(sockfd),
+    m_clientCommon(clientCommon),
     m_name(name),
     m_state(state),
     ui(new Ui::FriendList)
 {
     ui->setupUi(this);
 
-    m_clientCommon = new ClientCommon();
-    new_addFriend = new AddFriend();
+    m_socket = m_clientCommon->onGetSocket();
+
+    new_addFriend = new AddFriend(m_clientCommon, m_name);
 
     ui->label_name->setText(m_name);
 
@@ -23,7 +24,7 @@ FriendList::FriendList(QTcpSocket *sockfd, QString name, int state, QWidget *par
     connect(ui->btn_makeMasses, SIGNAL(clicked(bool)), this, SLOT(onMakeMassesClicked()));
     connect(ui->btn_exit, SIGNAL(clicked(bool)), this, SLOT(onExitClicked()));
 
-    connect(ui->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onTalkingWithOther(QListWidgetItem*)));
+    connect(ui->list_friend, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onTalkingWithOther(QListWidgetItem*)));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onChangeMyState(int)));
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(onFeedBackFromServer()));
 }
@@ -43,7 +44,6 @@ void FriendList::onAddNewFriendClicked()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     new_addFriend->show();
-    connect(new_addFriend, SIGNAL(addFriendSuccess()), this, SLOT(onFreshFriendList()));
     // onAddNewFriendClicked   <-Introduction
 }
 
@@ -97,6 +97,8 @@ void FriendList::onFeedBackFromServer()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     Package bag = m_clientCommon->onReadPackageFromServer();
+    ShowFriendList f_bag;
+    m_socket->read((char*)(&f_bag), sizeof(ShowFriendList));
 
     QString name = m_clientCommon->onCharToQString(bag.name);                           // name of other
     QString m_otherUser = m_clientCommon->onCharToQString(bag.otherUser);       // name of myself
@@ -112,8 +114,8 @@ void FriendList::onFeedBackFromServer()
     case User_TalkingAll:
 
         break;
-    case User_StateChange:
-        showAllFriendOnList();
+    case User_FriendList:
+        showAllFriendOnList(f_bag);
         break;
     default:
         break;
@@ -123,26 +125,24 @@ void FriendList::onFeedBackFromServer()
 }
 
 /*
- * onFreshFriendList
- * Introduction: fresh the friend list
- * Formal parameter: nothing
+ * showAllFriendOnList
+ * Introduction: show my friend list to screen
+ * Formal parameter: [frient list from server]
  * ReturnValue: nothing
  */
-void FriendList::onFreshFriendList()
+void FriendList::showAllFriendOnList(ShowFriendList f_bag)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-    showAllFriendOnList();
-    // onFreshFriendList   <-Introduction
-}
+    ui->list_friend->clear();
+    QString f_name;
+    int f_state;
 
-
-void FriendList::showAllFriendOnList()
-{
-    qDebug("[%s]", __PRETTY_FUNCTION__);
-    ui->listWidget->clear();
-
-
-
+    for (int i = 0; i < f_bag.i; i++) {
+        f_name = m_clientCommon->onCharToQString(f_bag.f_name[i]);
+        f_state = f_bag.f_state[i];
+        QListWidgetItem *f_item = new QListWidgetItem(changeFriendState(f_state), QObject::tr(f_name.toStdString().c_str()));
+        ui->list_friend->addItem(f_item);
+    }
     // showAllFriendOnList   <-Introduction
 }
 
@@ -154,10 +154,10 @@ void FriendList::showAllFriendOnList()
  */
 QIcon FriendList::changeFriendState(int m_state)
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
+    qDebug("[%s] state is [%d]", __PRETTY_FUNCTION__, m_state);
     QIcon f_state;
 
-    switch (state) {
+    switch (m_state) {
     case state_offline:
         f_state = QIcon(QObject::tr(":/new/prefix1/failure.png"));
         break;
@@ -180,9 +180,9 @@ QIcon FriendList::changeFriendState(int m_state)
 void FriendList::addItemInCombox()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
-    ui->comboBox->addItem(QIcon(":/new/prefix1/failure.png"), "offline");
-    ui->comboBox->addItem(QIcon(":/new/prefix1/true.png"), "online");
-    ui->comboBox->addItem(QIcon(":/new/prefix1/warning.png"), "hiding");
+    ui->comboBox->addItem(QIcon(":/new/prefix1/picture/offline.png"), "offline");
+    ui->comboBox->addItem(QIcon(":/new/prefix1/picture/online.png"), "online");
+    ui->comboBox->addItem(QIcon(":/new/prefix1/picture/hiding.png"), "hiding");
     // addItemInComBox   <-Introduction
 }
 
@@ -213,12 +213,8 @@ void FriendList::closeEvent()
     disconnect(ui->btn_addFriend, SIGNAL(clicked(bool)), this, SLOT(onAddNewFriendClicked()));
     disconnect(ui->btn_makeMasses, SIGNAL(clicked(bool)), this, SLOT(onMakeMassesClicked()));
     disconnect(ui->btn_exit, SIGNAL(clicked(bool)), this, SLOT(onExitClicked()));
-    disconnect(ui->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onTalkingWithOther(QListWidgetItem*)));
+    disconnect(ui->list_friend, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onTalkingWithOther(QListWidgetItem*)));
     disconnect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onChangeMyState(int)));
-
-    if (NULL != new_addFriend) {
-        disconnect(new_addFriend, SIGNAL(addFriendSuccess()), this, SLOT(onFreshFriendList()));
-    }
 
     if (NULL != m_socket) {
         disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(onFeedBackFromServer()));
