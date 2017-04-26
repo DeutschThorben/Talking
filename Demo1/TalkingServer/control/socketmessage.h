@@ -6,6 +6,8 @@
 #include <QIcon>
 #include <QTcpSocket>
 
+#include "model/package.h"
+
 enum user_state {
     state_offline = 0,
     state_online,
@@ -28,6 +30,8 @@ public:
     // find socket of name
     QTcpSocket* onSelectSocketByName(QString);
 
+    void onSendMessageToEveryone(PackageType, QString, QString, int);
+
     /// action of state map
     // when user has loaded
     void onAddUserToState(QString, int);
@@ -42,7 +46,7 @@ public:
     QIcon onChangeStateToIcon(int);
 
 signals:
-
+    void onSendToEveryone(QString, QTcpSocket*);
 public slots:
 
 private:

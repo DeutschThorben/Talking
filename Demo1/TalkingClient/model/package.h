@@ -10,8 +10,7 @@ enum PackageType {
     User_IsSameName,
     User_FindFriend,
     User_StateChange,
-    User_CreateFriendList,
-    User_FriendList
+    User_CreateFriendList
 };
 
 struct Package {
@@ -21,12 +20,6 @@ struct Package {
     char otherUser[20];
     char message[60];
     int result;
-};
-
-struct ShowFriendList {
-    PackageType head;
-    char f_name[20];
-    int f_state[20];
 };
 
 #endif // PACKAGE

@@ -39,6 +39,10 @@ private slots:
 
     // user state change
     void onUserStateChange(QString, QString);
+    void onUserChangeState(QString, int);
+
+    // user add other friend
+    void onUserAddOther(QString, QString);
 
 private:
     Ui::TalkingServer *ui;

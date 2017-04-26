@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     model/controltable.cpp \
     model/tablecommon.cpp \
     control/socketmessage.cpp \
-    model/userinformation.cpp
+    model/userinformation.cpp \
+    model/controlfrienttable.cpp \
+    model/friendcommon.cpp
 
 HEADERS  += talkingserver.h \
     model/servercommon.h \
@@ -31,7 +33,9 @@ HEADERS  += talkingserver.h \
     model/controltable.h \
     model/tablecommon.h \
     control/socketmessage.h \
-    model/userinformation.h
+    model/userinformation.h \
+    model/controlfrienttable.h \
+    model/friendcommon.h
 
 FORMS    += talkingserver.ui
 

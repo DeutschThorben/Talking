@@ -50,6 +50,19 @@ QTcpSocket* SocketMessage::onSelectSocketByName(QString n_name)
     // onSelectStateFromName   <-Introduction
 }
 
+void SocketMessage::onSendMessageToEveryone(PackageType head, QString name, QString message, int state)
+{
+    qDebug("[%s] head is [%d]", __PRETTY_FUNCTION__, head);
+    QMap<QString, QTcpSocket*>::iterator iter;
+    for (iter = map_onlineUser.begin(); iter != map_onlineUser.end(); ++iter) {
+        qDebug("[%s] name is [%s],  socket is [%p]", __PRETTY_FUNCTION__, iter.key().toStdString().c_str(), iter.value());
+        if (name != iter.key()) {
+            emit onSendToEveryone(iter.key(), iter.value());
+        }
+    }
+    // onSendMessageToEveryone   <-Introduction
+}
+
 /*
  * onAddUserToState
  * Introduction: add a online user into map_state

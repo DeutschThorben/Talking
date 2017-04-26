@@ -41,7 +41,10 @@ TalkingServer::~TalkingServer()
     disconnect(ui->btn_empty, SIGNAL(clicked(bool)), this, SLOT(onClearListWork()));
     disconnect(ui->btn_exit, SIGNAL(clicked(bool)), this, SLOT(onExitClicked()));
     disconnect(ui->list_user, SIGNAL(currentTextChanged(QString)), this, SLOT(onGetListUserName(QString)));
-    disconnect(new_client, SIGNAL(onUserStateChange(QString)), this, SLOT(onUserStateChange(QString,QString)));
+    disconnect(new_client, SIGNAL(onUserStateChange(QString, QString)), this, SLOT(onUserStateChange(QString,QString)));
+    disconnect(new_client, SIGNAL(onUserFriendAdd(QString,QString)), this, SLOT(onUserAddOther(QString,QString)));
+    disconnect(new_client, SIGNAL(onUserChangeState(QString,int)), this, SLOT(onUserChangeState(QString,int)));
+
     delete ui;
 }
 
@@ -59,7 +62,9 @@ void TalkingServer::onConnection()
     qDebug("[%s] new socket is [%p]", __PRETTY_FUNCTION__, new_socket);
 
     // accept state change signal from clientcontrol
-    connect(new_client, SIGNAL(onUserStateChange(QString)), this, SLOT(onUserStateChange(QString,QString)), Qt::DirectConnection);
+    connect(new_client, SIGNAL(onUserStateChange(QString, QString)), this, SLOT(onUserStateChange(QString,QString)), Qt::DirectConnection);
+    connect(new_client, SIGNAL(onUserFriendAdd(QString,QString)), this, SLOT(onUserAddOther(QString,QString)), Qt::DirectConnection);
+    connect(new_client, SIGNAL(onUserChangeState(QString,int)), this, SLOT(onUserChangeState(QString,int)), Qt::DirectConnection);
 
     // move new client to a thread
     QThread *new_thread = new QThread();
@@ -179,4 +184,18 @@ void TalkingServer::onUserStateChange(QString a_name, QString a_state)
     ui->list_message->addItem(new QListWidgetItem(QObject::tr(word)));
     showAllUser();
     // onUserStateChange   <-Introduction
+}
+
+/*
+ * onUserAddOther
+ * Introduction: friend change
+ * Formal parameter: [user's name, other user's name]
+ * ReturnValue: nothing
+ */
+void TalkingServer::onUserAddOther(QString m_name, QString f_name)
+{
+    qDebug("[%s] ", __PRETTY_FUNCTION__);
+    QString word = "User [" + f_name + "] add the user [" + m_name + "] with friend";
+    ui->list_message->addItem(new QListWidgetItem(QObject::tr(word)));
+    // onUserAddOther   <-Introduction
 }
