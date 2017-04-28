@@ -38,8 +38,8 @@ private slots:
     void onGetListUserName(QString);
 
     // user state change
-    void onUserStateChange(QString, QString);
-    void onUserChangeState(QString, int);
+    void onUserStateChange(QString, int, int);
+//    void onUserChangeState(QString, int);
 
     // user add other friend
     void onUserAddOther(QString, QString);
@@ -52,7 +52,7 @@ private:
     TableCommon *m_tableCommon;
     SocketMessage *m_socketMessage;
 
-    void showAllUser();
+    void showAllUser(QString = "", int = 0);
 };
 
 #endif // TALKINGSERVER_H

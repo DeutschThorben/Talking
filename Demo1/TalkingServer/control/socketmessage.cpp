@@ -1,8 +1,19 @@
 #include "socketmessage.h"
 
+SocketMessage* SocketMessage::instance = NULL;
+
 SocketMessage::SocketMessage(QObject *parent) : QObject(parent)
 {
 
+}
+
+SocketMessage* SocketMessage::getInstance()
+{
+    if (NULL == instance) {
+        instance = new SocketMessage();
+    }
+    return instance;
+    // getInstance   <-Introduction
 }
 
 /*
@@ -73,6 +84,11 @@ void SocketMessage::onAddUserToState(QString n_name, int n_state)
 {
     qDebug("[%s] the name is [%s], the state is [%d]", __PRETTY_FUNCTION__, n_name.toStdString().c_str(), n_state);
     map_userState.insert(n_name, n_state);
+    QMap<QString, int>::iterator iter;
+    for (iter = map_userState.begin(); iter != map_userState.end(); ++iter) {
+        qDebug("[%s] the name is [%s], the state is [%d]", __PRETTY_FUNCTION__, iter.key().toStdString().c_str(), iter.value());
+
+    }
     // onAddUserToState   <-Introduction
 }
 
@@ -104,9 +120,8 @@ void SocketMessage::onChangeState(QString n_name, int n_state)
 int SocketMessage::onSelectStateByName(QString n_name)
 {
     qDebug("[%s] the name is [%s]", __PRETTY_FUNCTION__, n_name.toStdString().c_str());
-
     QMap<QString, int>::iterator iter;
-    for (iter = map_userState.begin(); iter != map_userState.end(); ++iter) {
+    for (iter = map_userState.begin(); iter != map_userState.end(); iter++) {
         if (n_name == iter.key()) {
             return iter.value();
         }
@@ -155,6 +170,9 @@ QIcon SocketMessage::onChangeStateToIcon(int n_state)
         break;
     case state_hiding:
         state_icon = QIcon(QObject::tr(":/new/userState/picture/hiding.png"));
+        break;
+    case state_NotOffline:
+        state_icon = QIcon(QObject::tr(":/new/userState/picture/notOffline.png"));
         break;
     default:
         break;

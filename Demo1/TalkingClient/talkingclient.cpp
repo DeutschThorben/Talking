@@ -3,6 +3,7 @@
 
 TalkingClient::TalkingClient(QWidget *parent) :
     QMainWindow(parent),
+    m_state(1),
     ui(new Ui::TalkingClient)
 {
     ui->setupUi(this);
@@ -25,6 +26,16 @@ TalkingClient::~TalkingClient()
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
 
+    disconnect(ui->btn_login, SIGNAL(clicked(bool)), this, SLOT(onLoginClicked()));
+    disconnect(ui->btn_regist, SIGNAL(clicked(bool)), this, SLOT(onRegistClicked()));
+    disconnect(ui->btn_exit, SIGNAL(clicked(bool)), this, SLOT(onExitClicked()));
+
+    disconnect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onChooseLoginState(int)));
+
+    if (NULL != m_socket) {
+        disconnect(m_socket, SIGNAL(readyRead()), this, SLOT(onReadFromServer()));
+    }
+
     delete m_clientCommon;
     delete ui;
 }
@@ -37,13 +48,13 @@ TalkingClient::~TalkingClient()
  */
 void TalkingClient::onLoginClicked()
 {
-    qDebug("[%s]", __PRETTY_FUNCTION__);
     m_name = ui->lineEdit_name->text();
     QString m_keyword = ui->lineEdit_KWD->text();
 
     // make connect with server
     QString m_count = "127.0.0.1";
     m_socket->connectToHost(m_count.toStdString().c_str(), 1024);
+    qDebug("[%s] name is [%s], state is [%d]", __PRETTY_FUNCTION__, m_name.toStdString().c_str(), m_state);
     m_clientCommon->onSetSocket(m_socket);
     m_clientCommon->onWritePackageToServer(User_Login, m_state, m_name, m_keyword);
     // onLoginClicked   <-Introduction
@@ -150,7 +161,7 @@ void TalkingClient::addItemCombox()
  * Formal parameter: nothing
  * ReturnValue: nothing
  */
-void TalkingClient::closeEvent()
+void TalkingClient::closeEvent(QCloseEvent *)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
     disconnect(ui->btn_login, SIGNAL(clicked(bool)), this, SLOT(onLoginClicked()));

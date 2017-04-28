@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QSqlError>
+
+#include "model/controlfrienttable.h"
 
 class ControlTable : public QObject
 {

@@ -1,16 +1,17 @@
 #include "clientcontrol.h"
 
-ClientControl::ClientControl(QTcpSocket *sockfd, QObject *parent)
+ClientControl::ClientControl(QTcpSocket *sockfd, SocketMessage *socketMessage, QObject *parent)
     : QObject(parent),
-      m_socket(sockfd)
+      m_socket(sockfd),
+      m_socketMessage(socketMessage)
 {
     m_serverCommon = new ServerCommon();
     m_tableCommon = new TableCommon();
     m_friendCommon = new FriendCommon();
-    m_socketMessage = new SocketMessage();
 
     m_serverCommon->onSetMySocket(m_socket);
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(onPackageRead()));
+    m_serverCommon->onSetSocketMessage(m_socketMessage);
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(onPackageRead()), Qt::DirectConnection);
     connect(m_socketMessage, SIGNAL(onSendToEveryone(QString,QTcpSocket*)), this, SLOT(onFriendListToEveryone(QString,QTcpSocket*)));
 }
 
@@ -92,7 +93,7 @@ void ClientControl::onNewUserRegist(QString new_name, QString new_keywork)
 
     if (m_tableCommon->onAddNewUser(new_name, new_keywork)) {
         result = result_Success;
-        emit onUserStateChange(new_name, "Regist");
+        emit onUserStateChange(new_name, state_regist, 0);
     }
     else {
         result = result_Failure;
@@ -109,7 +110,7 @@ void ClientControl::onNewUserRegist(QString new_name, QString new_keywork)
  */
 void ClientControl::onUserLoading(QString login_name, QString login_keyword, int login_state)
 {
-    qDebug("[%s] ", __PRETTY_FUNCTION__);
+    qDebug("[%s] name is [%s], state is [%d]", __PRETTY_FUNCTION__, login_name.toStdString().c_str(), login_state);
     int result = 0;
     if (m_tableCommon->onIsRegistUser(login_name)) {
         if (m_tableCommon->onIsCorrectKeywordLogin(login_name, login_keyword)) {
@@ -121,12 +122,12 @@ void ClientControl::onUserLoading(QString login_name, QString login_keyword, int
                 result = result_Success;
 
                 // add this user to map_state and map_online
-                m_socketMessage->onAddUserToOnline(login_name, m_socket);
-                m_socketMessage->onAddUserToState(login_name, login_state);
-
+                if (state_NotOffline != login_state) {
+                    m_socketMessage->onAddUserToOnline(login_name, m_socket);
+                    m_socketMessage->onAddUserToState(login_name, login_state);
+                }
                 // send signal to server to change list state
-                emit onUserStateChange(login_name, "Login");
-
+                emit onUserStateChange(login_name, login_state, 0);
                 // send friend list to client
                 onGetFriendList(login_name, m_socket);
                 // inform everyone to get friend list
@@ -241,15 +242,30 @@ void ClientControl::onCreateAFriendList(QString m_name)
  */
 void ClientControl::onClientStateChange(QString m_name, int m_state)
 {
-    qDebug("[%s] ", __PRETTY_FUNCTION__);
+    qDebug("[%s] name is [%s], change state is [%d]", __PRETTY_FUNCTION__, m_name.toStdString().c_str(), m_state);
+    int ret = 1;
     if (state_offline == m_state) {
         // user is exit
         m_socketMessage->onRemoveUserFromOnline(m_name);
         m_socketMessage->onRemoveUserFromState(m_name);
+        ret = 0;
+    }
+    else if (state_NotOffline == m_state) {
+        m_socketMessage->onRemoveUserFromOnline(m_name);
+        m_socketMessage->onRemoveUserFromState(m_name);
     }
     else {
-        m_socketMessage->onChangeState(m_name, m_state);
+        if (state_offline == m_socketMessage->onSelectStateByName(m_name)) {
+            // user change online or hiding
+            m_socketMessage->onAddUserToState(m_name, m_state);
+            m_socketMessage->onAddUserToOnline(m_name, m_socket);
+        }
+        else {
+            m_socketMessage->onChangeState(m_name, m_state);
+        }
     }
+    emit onUserStateChange(m_name, m_state, ret);
+//    emit onUserChangeState(m_name, m_state);
     onSendMyStateToFriend(m_name, m_state);
     // onClientStateChange   <-Introduction
 }
@@ -262,13 +278,13 @@ void ClientControl::onClientStateChange(QString m_name, int m_state)
  */
 void ClientControl::onGetFriendList(QString m_name, QTcpSocket* sockfd)
 {
-    qDebug("[%s] ", __PRETTY_FUNCTION__);
     ShowFriendList bag;
     QString f_name;
     int f_state = 0;
     int i = 0;
 
     int maxID = m_friendCommon->onGetMaxID(m_name);
+    qDebug("[%s] maxID is [%d]", __PRETTY_FUNCTION__, maxID);
     if (maxID > 0) {
         for (int ID = 1; ID <= maxID; ID++) {
             f_name = m_friendCommon->onSelectNameForID(m_name, ID);
@@ -278,19 +294,20 @@ void ClientControl::onGetFriendList(QString m_name, QTcpSocket* sockfd)
                 continue;
             }
 
+            // get the user's state, if the state is hiding, set the state is offline
             f_state = m_socketMessage->onSelectStateByName(f_name);
             qDebug("[%s] state is [%d]", __PRETTY_FUNCTION__, f_state);
             if (state_hiding == f_state) {
                 f_state = state_offline;
             }
 
+            // pack all information of friend
             strcpy(bag.f_name[i], f_name.toStdString().c_str());
             qDebug("[%s] 111 name is [%s]", __PRETTY_FUNCTION__, bag.f_name[i][20]);
             bag.f_state[i] = f_state;
             qDebug("[%s] state is [%d]", __PRETTY_FUNCTION__, bag.f_state[i]);
             i++;
         }
-
 
         bag.head = User_FriendList;
         bag.i = i;

@@ -192,7 +192,7 @@ void TalkingListScreen::onFeedBackFromServer()
         break;
      case USER_Online_Back:
         qDebug("[%s] Already online friend is [%s], state is [%d]", __PRETTY_FUNCTION__, f_name.toStdString().c_str(), bag.result);
-        onFriendStateAlreadyOnline(f_name, bag.result);
+//        onFriendStateAlreadyOnline(f_name, bag.result);
         break;
      case USER_Talking:
         qDebug("[%s] Message from other [%s]", __PRETTY_FUNCTION__, f_message.toStdString().c_str());

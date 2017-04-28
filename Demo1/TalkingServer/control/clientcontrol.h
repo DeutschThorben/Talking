@@ -25,7 +25,7 @@ class ClientControl : public QObject
 {
     Q_OBJECT
 public:
-    explicit ClientControl(QTcpSocket *sockfd, QObject *parent = 0);
+    explicit ClientControl(QTcpSocket *sockfd, SocketMessage *socketMessage, QObject *parent = 0);
     ~ClientControl();
 
     // regist
@@ -54,11 +54,11 @@ public:
 
 signals:
     // user add or delete
-    void onUserStateChange(QString, QString);
+    void onUserStateChange(QString, int, int);
     // user add friend success
     void onUserFriendAdd(QString, QString);
     // user's state change
-    void onUserChangeState(QString, int);
+//    void onUserChangeState(QString, int);
 
 public slots:
     void onPackageRead();
@@ -67,11 +67,11 @@ public slots:
 
 private:
     QTcpSocket *m_socket;
-
+    SocketMessage *m_socketMessage;
     ServerCommon *m_serverCommon;
     TableCommon *m_tableCommon;
     FriendCommon *m_friendCommon;
-    SocketMessage *m_socketMessage;
+
 };
 
 #endif // CLIENTCONTROL_H

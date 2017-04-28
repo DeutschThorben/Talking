@@ -9,6 +9,7 @@ ControlTable::ControlTable(QObject *parent) : QObject(parent)
     }
     else {
         db = QSqlDatabase::addDatabase("QSQLITE");
+        ControlFrientTable::getInstance()->setDb(db);
     }
 }
 
@@ -24,7 +25,14 @@ ControlTable* ControlTable::getInstance()
 void ControlTable::onCreateConnect()
 {
     db.setDatabaseName("../TalkingServer/user.db");
-    db.open();
+    bool tmp = false;
+
+
+    tmp = db.open();
+    qDebug("[%s] tmp is [%d]", __PRETTY_FUNCTION__,tmp);
+    QSqlError ret = db.lastError();
+    qDebug("[%s] databaseText is [%s]", __PRETTY_FUNCTION__, ret.databaseText().toStdString().c_str());
+    qDebug("[%s] Error Type is [%d]", __PRETTY_FUNCTION__, ret.type());
     // onCreateConnect   <-Introduction
 }
 

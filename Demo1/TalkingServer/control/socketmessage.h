@@ -12,6 +12,8 @@ enum user_state {
     state_offline = 0,
     state_online,
     state_hiding,
+    state_NotOffline,
+    state_regist,
     nothing
 };
 
@@ -19,8 +21,7 @@ class SocketMessage : public QObject
 {
     Q_OBJECT
 public:
-    explicit SocketMessage(QObject *parent = 0);
-
+    static SocketMessage *getInstance();
 
     /// action of online map
     // user is loading and state is online
@@ -50,6 +51,10 @@ signals:
 public slots:
 
 private:
+    explicit SocketMessage(QObject *parent = 0);
+
+    static SocketMessage *instance;
+
     QMap<QString, int> map_userState;
     QMap<QString, QTcpSocket*> map_onlineUser;
 

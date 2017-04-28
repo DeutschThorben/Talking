@@ -28,9 +28,10 @@ private slots:
     void onBtnExitClicked();
 
 private:
-    Ui::AddFriend *ui;
-    QString m_name;
     ClientCommon *m_clientCommon;
+    QString m_name;
+    Ui::AddFriend *ui;
+
 
     void whetherAgreeToFriend(QString);
 

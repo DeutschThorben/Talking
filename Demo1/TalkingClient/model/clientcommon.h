@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QCloseEvent>
 
 #include "model/package.h"
 
@@ -21,7 +22,8 @@ enum result_Action {
 enum myState {
     state_offline,
     state_online,
-    state_hiding
+    state_hiding,
+    state_NotOffline
 };
 
 class ClientCommon : public QObject

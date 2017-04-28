@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QHostAddress>
 #include <QMessageBox>
+#include <QCloseEvent>
 
 #include "model/clientcommon.h"
 
@@ -31,16 +32,19 @@ private slots:
 
     void onChooseLoginState(int);
 
+protected:
+    virtual void closeEvent(QCloseEvent *);
+
 private:
+    int m_state;
     Ui::TalkingClient *ui;
 
     QTcpSocket *m_socket;
     ClientCommon *m_clientCommon;
     QString m_name;
-    int m_state;
+
 
     void addItemCombox();
-    virtual void closeEvent();
 };
 
 #endif // TALKINGCLIENT_H

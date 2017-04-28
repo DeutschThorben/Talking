@@ -9,7 +9,7 @@ TalkingServer::TalkingServer(QWidget *parent) :
 
     m_server = new QTcpServer();
     m_tableCommon = new TableCommon();
-    m_socketMessage = new SocketMessage();
+    m_socketMessage = SocketMessage::getInstance();
 
     if (!m_server->isListening()) {
         m_server->listen(QHostAddress::Any, 1024);
@@ -41,9 +41,9 @@ TalkingServer::~TalkingServer()
     disconnect(ui->btn_empty, SIGNAL(clicked(bool)), this, SLOT(onClearListWork()));
     disconnect(ui->btn_exit, SIGNAL(clicked(bool)), this, SLOT(onExitClicked()));
     disconnect(ui->list_user, SIGNAL(currentTextChanged(QString)), this, SLOT(onGetListUserName(QString)));
-    disconnect(new_client, SIGNAL(onUserStateChange(QString, QString)), this, SLOT(onUserStateChange(QString,QString)));
+    disconnect(new_client, SIGNAL(onUserStateChange(QString, int, int)), this, SLOT(onUserStateChange(QString,int, int)));
     disconnect(new_client, SIGNAL(onUserFriendAdd(QString,QString)), this, SLOT(onUserAddOther(QString,QString)));
-    disconnect(new_client, SIGNAL(onUserChangeState(QString,int)), this, SLOT(onUserChangeState(QString,int)));
+//    disconnect(new_client, SIGNAL(onUserChangeState(QString, int)), this, SLOT(onUserChangeState(QString, int)));
 
     delete ui;
 }
@@ -58,13 +58,13 @@ void TalkingServer::onConnection()
 {
     qDebug("[%s] ", __PRETTY_FUNCTION__);
     QTcpSocket *new_socket = m_server->nextPendingConnection();
-    new_client = new ClientControl(new_socket);
-    qDebug("[%s] new socket is [%p]", __PRETTY_FUNCTION__, new_socket);
+    new_client = new ClientControl(new_socket, m_socketMessage);
+    qDebug("[%s] new socket is [%p], socketMessage is [%p]", __PRETTY_FUNCTION__, new_socket, m_socketMessage);
 
     // accept state change signal from clientcontrol
-    connect(new_client, SIGNAL(onUserStateChange(QString, QString)), this, SLOT(onUserStateChange(QString,QString)), Qt::DirectConnection);
+    connect(new_client, SIGNAL(onUserStateChange(QString, int, int)), this, SLOT(onUserStateChange(QString,int, int)), Qt::DirectConnection);
     connect(new_client, SIGNAL(onUserFriendAdd(QString,QString)), this, SLOT(onUserAddOther(QString,QString)), Qt::DirectConnection);
-    connect(new_client, SIGNAL(onUserChangeState(QString,int)), this, SLOT(onUserChangeState(QString,int)), Qt::DirectConnection);
+//    connect(new_client, SIGNAL(onUserChangeState(QString, int)), this, SLOT(onUserChangeState(QString, int)), Qt::DirectConnection);
 
     // move new client to a thread
     QThread *new_thread = new QThread();
@@ -141,7 +141,7 @@ void TalkingServer::onGetListUserName(QString n_name)
  * Formal parameter: nothing
  * ReturnValue: nothing
  */
-void TalkingServer::showAllUser()
+void TalkingServer::showAllUser(QString name, int state)
 {
     qDebug("[%s] ", __PRETTY_FUNCTION__);
     ui->list_user->clear();
@@ -152,7 +152,14 @@ void TalkingServer::showAllUser()
     for (int ID = 1; ID <= table_maxID; ID++) {
         a_name = m_tableCommon->onSelectNameForID(ID);
         if ("" != a_name) {
-            a_state = m_socketMessage->onSelectStateByName(a_name);
+            if (name == a_name) {
+                // user's state is NotOffline
+                a_state = state;
+            }
+            else {
+                // user's state is other
+                a_state = m_socketMessage->onSelectStateByName(a_name);
+            }
             qDebug("[%s], name is [%s] state is [%d]", __PRETTY_FUNCTION__,a_name.toStdString().c_str(), a_state);
             QListWidgetItem *m_userItem = new QListWidgetItem(m_socketMessage->onChangeStateToIcon(a_state), QObject::tr(a_name.toStdString().c_str()));
             ui->list_user->addItem(m_userItem);
@@ -167,22 +174,23 @@ void TalkingServer::showAllUser()
  * Formal parameter: [user's name, will change state]
  * ReturnValue: nothing
  */
-void TalkingServer::onUserStateChange(QString a_name, QString a_state)
+void TalkingServer::onUserStateChange(QString a_name, int a_state, int type)
 {
-    qDebug("[%s] ", __PRETTY_FUNCTION__);
+    qDebug("[%s] name is [%s], state is [%d]", __PRETTY_FUNCTION__, a_name.toStdString().c_str(), a_state);
     QString word;
-    if ("Regist" == a_state) {
-        word = word + "User [ " + a_name + " ] is registed already";
+    if (0 == type) {
+        if (state_regist == a_state) {
+            word = word + "User [ " + a_name + " ] is registed already";
+        }
+        else if (state_offline == a_state) {
+            word = word + "User [ " + a_name + " ] is exit already";
+        }
+        else {
+            word = word + "User [ " + a_name + " ] is loaded already";
+        }
+        ui->list_message->addItem(new QListWidgetItem(QObject::tr(word.toStdString().c_str())));
     }
-    else if ("Login" == a_state) {
-        word = word + "User [ " + a_name + " ] is loaded already";
-    }
-    else if ("Exit" == a_state) {
-        word = word + "User [ " + a_name + " ] is exit already";
-    }
-
-    ui->list_message->addItem(new QListWidgetItem(QObject::tr(word.toStdString().c_str())));
-    showAllUser();
+    showAllUser(a_name, a_state);
     // onUserStateChange   <-Introduction
 }
 
@@ -200,9 +208,9 @@ void TalkingServer::onUserAddOther(QString m_name, QString f_name)
     // onUserAddOther   <-Introduction
 }
 
-void TalkingServer::onUserChangeState(QString u_name, int u_state)
-{
-    qDebug("[%s] ", __PRETTY_FUNCTION__);
-    showAllUser();
-    // onUserChangeState   <-Introduction
-}
+//void TalkingServer::onUserChangeState(QString name, int state)
+//{
+//    qDebug("[%s] ", __PRETTY_FUNCTION__);
+//    showAllUser(name, state);
+//    // onUserChangeState   <-Introduction
+//}

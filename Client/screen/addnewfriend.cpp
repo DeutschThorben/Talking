@@ -91,14 +91,14 @@ void AddNewFriend::onFindFriendIsSuccess(int m_result, QString f_name)
         QMessageBox::warning(NULL, "Sorry", "This user don't agree to become a friend with you!", QMessageBox::Ok);
     }
     else if (4 == m_result) {
-        QString result = "User[ " + f_name + " ] want to add you to a friend, would you agree a frient with him ?";
-        QMessageBox agree_message = QMessageBox::question(NULL, "Question", result, QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
-        if (QMessageBox::Yes == agree_message.exec()) {
-            m_clientCommon->onWritePackage(USER_FindFriend, m_name, "", f_name, "", 1);
-        }
-        else {
-            m_clientCommon->onWritePackage(USER_FindFriend, m_name, "", f_name, "", 0);
-        }
+//        QString result = "User[ " + f_name + " ] want to add you to a friend, would you agree a frient with him ?";
+//        QMessageBox agree_message = QMessageBox::question(NULL, "Question", result, QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+//        if (QMessageBox::Yes == agree_message.exec()) {
+//            m_clientCommon->onWritePackage(USER_FindFriend, m_name, "", f_name, "", 1);
+//        }
+//        else {
+//            m_clientCommon->onWritePackage(USER_FindFriend, m_name, "", f_name, "", 0);
+//        }
     }
     // onFindFriendIsSuccess   <-Introduction
 }

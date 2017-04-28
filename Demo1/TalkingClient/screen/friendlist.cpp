@@ -6,6 +6,7 @@ FriendList::FriendList(ClientCommon* clientCommon, QString name, int state, QWid
     m_clientCommon(clientCommon),
     m_name(name),
     m_state(state),
+    tmp(0),
     ui(new Ui::FriendList)
 {
     ui->setupUi(this);
@@ -31,6 +32,8 @@ FriendList::FriendList(ClientCommon* clientCommon, QString name, int state, QWid
 
 FriendList::~FriendList()
 {
+    qDebug("[%s]", __PRETTY_FUNCTION__);
+
     delete ui;
 }
 
@@ -100,13 +103,13 @@ void FriendList::onFeedBackFromServer()
     ShowFriendList f_bag;
     m_socket->read((char*)(&f_bag), sizeof(ShowFriendList));
 
-    QString name = m_clientCommon->onCharToQString(bag.name);                           // name of other
-    QString m_otherUser = m_clientCommon->onCharToQString(bag.otherUser);       // name of myself
+    QString name = m_clientCommon->onCharToQString(bag.name);                           // name of myself
+    QString m_otherUser = m_clientCommon->onCharToQString(bag.otherUser);       // name of other
     QString m_message = m_clientCommon->onCharToQString(bag.message);
 
     switch (bag.head) {
     case User_FindFriend:
-        new_addFriend->resultOfFindFriend(name, bag.result);
+        new_addFriend->resultOfFindFriend(m_otherUser, bag.result);
         break;
     case User_Talking:
 
@@ -183,6 +186,8 @@ void FriendList::addItemInCombox()
     ui->comboBox->addItem(QIcon(":/new/prefix1/picture/offline.png"), "offline");
     ui->comboBox->addItem(QIcon(":/new/prefix1/picture/online.png"), "online");
     ui->comboBox->addItem(QIcon(":/new/prefix1/picture/hiding.png"), "hiding");
+
+    ui->comboBox->setCurrentIndex(m_state);
     // addItemInComBox   <-Introduction
 }
 
@@ -195,6 +200,11 @@ void FriendList::addItemInCombox()
 void FriendList::sendMyStateToFriend(int state)
 {
     qDebug("[%s] my state is [%d]", __PRETTY_FUNCTION__, state);
+    if (state_offline == state) {
+        if (1 != tmp) {
+            state = state_NotOffline;
+        }
+    }
     m_clientCommon->onWritePackageToServer(User_StateChange, state, m_name);
     // sendMyStateToFriend   <-Introduction
 }
@@ -205,9 +215,10 @@ void FriendList::sendMyStateToFriend(int state)
  * Formal parameter: nothing
  * ReturnValue: nothing
  */
-void FriendList::closeEvent()
+void FriendList::closeEvent(QCloseEvent *)
 {
     qDebug("[%s]", __PRETTY_FUNCTION__);
+    tmp = 1;
     sendMyStateToFriend(state_offline);
 
     disconnect(ui->btn_addFriend, SIGNAL(clicked(bool)), this, SLOT(onAddNewFriendClicked()));

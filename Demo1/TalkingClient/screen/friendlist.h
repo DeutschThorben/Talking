@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QComboBox>
+#include <QCloseEvent>
 
 #include "model/clientcommon.h"
 
@@ -37,18 +38,19 @@ private slots:
     // message from server
     void onFeedBackFromServer();
 
+protected:
+    virtual void closeEvent(QCloseEvent *);
 
 private:
-    QTcpSocket *m_socket;
+    ClientCommon *m_clientCommon;
     QString m_name;
+    int m_state;
+    int tmp;
     Ui::FriendList *ui;
 
-    ClientCommon *m_clientCommon;
+    QTcpSocket *m_socket;
     AddFriend *new_addFriend;
     Talking *new_talking;
-
-    int m_state;
-
 
 
     void showAllFriendOnList(ShowFriendList);
@@ -56,7 +58,6 @@ private:
     void addItemInCombox();
 
     void sendMyStateToFriend(int);
-    virtual void closeEvent();
 };
 
 #endif // FRIENDLIST_H

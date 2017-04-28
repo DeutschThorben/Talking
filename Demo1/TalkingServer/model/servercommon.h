@@ -25,12 +25,15 @@ public:
     // find socket of the client
     void onSetMySocket(QTcpSocket*);
 
+    void onSetSocketMessage(SocketMessage*);
+
 signals:
 
 public slots:
 
 private:
     QTcpSocket *m_sockfd;
+    SocketMessage *m_message;
 };
 
 #endif // SERVERCOMMON_H

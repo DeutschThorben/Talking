@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
 
 class ControlFrientTable : public QObject
 {
@@ -12,6 +14,7 @@ public:
     void onCreateConnect();
     void onDestroyConnect();
 
+    void setDb(QSqlDatabase);
 signals:
 
 private:

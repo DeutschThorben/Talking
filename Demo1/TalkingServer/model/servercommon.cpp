@@ -15,7 +15,6 @@ void ServerCommon::onWriteToClient(PackageType head, int result, QString name, Q
 {
     qDebug("[%s] ", __PRETTY_FUNCTION__);
     Package bag;
-    SocketMessage *m_message = new SocketMessage();
 
     bag.head = head;
     bag.result = result;
@@ -94,4 +93,11 @@ void ServerCommon::onSetMySocket(QTcpSocket *m_socket)
     qDebug("[%s] ", __PRETTY_FUNCTION__);
     m_sockfd = m_socket;
     // onSetMySocket   <-Introduction
+}
+
+void ServerCommon::onSetSocketMessage(SocketMessage *m_socketMessage)
+{
+    qDebug("[%s] ", __PRETTY_FUNCTION__);
+    m_message = m_socketMessage;
+    // onSetSocketMessage   <-Introduction
 }

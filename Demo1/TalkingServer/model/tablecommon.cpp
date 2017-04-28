@@ -134,6 +134,7 @@ int TableCommon::onGetMaxID()
         maxValue = query.value(0).toInt();
     }
     ControlTable::getInstance()->onDestroyConnect();
+    qDebug("[%s] maxID is [%d]", __PRETTY_FUNCTION__, maxValue);
     return maxValue;
     // onGetMaxID   <-Introduction
 }
