@@ -178,18 +178,31 @@ void TalkingServer::onUserStateChange(QString a_name, int a_state, int type)
 {
     qDebug("[%s] name is [%s], state is [%d]", __PRETTY_FUNCTION__, a_name.toStdString().c_str(), a_state);
     QString word;
-    if (0 == type) {
-        if (state_regist == a_state) {
-            word = word + "User [ " + a_name + " ] is registed already";
-        }
-        else if (state_offline == a_state) {
-            word = word + "User [ " + a_name + " ] is exit already";
-        }
-        else {
-            word = word + "User [ " + a_name + " ] is loaded already";
-        }
+    if ((0 == type) && (state_offline != a_state) && (state_regist != a_state)) {
+        word = word + "User [ " + a_name + " ] is loading already";
         ui->list_message->addItem(new QListWidgetItem(QObject::tr(word.toStdString().c_str())));
     }
+
+    switch(a_state) {
+    case state_regist:
+        word = word + "User [ " + a_name + " ] is registed already";
+        break;
+    case state_offline:
+        word = word + "User [ " + a_name + " ] is exit already";
+        break;
+    case state_NotOffline:
+        word = word + "User [ " + a_name + " ] change state to NotOffline";
+        break;
+    case state_online:
+        word = word + "User [ " + a_name + " ] change state to online";
+        break;
+    case state_hiding:
+        word = word + "User [ " + a_name + " ] change state to hiding";
+        break;
+    default :
+        break;
+    }
+    ui->list_message->addItem(new QListWidgetItem(QObject::tr(word.toStdString().c_str())));
     showAllUser(a_name, a_state);
     // onUserStateChange   <-Introduction
 }

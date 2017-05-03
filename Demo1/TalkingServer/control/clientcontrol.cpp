@@ -244,16 +244,16 @@ void ClientControl::onClientStateChange(QString m_name, int m_state)
 {
     qDebug("[%s] name is [%s], change state is [%d]", __PRETTY_FUNCTION__, m_name.toStdString().c_str(), m_state);
     int ret = 1;
-    if (state_offline == m_state) {
+    if (state_offline == m_state || state_NotOffline == m_state) {
         // user is exit
         m_socketMessage->onRemoveUserFromOnline(m_name);
         m_socketMessage->onRemoveUserFromState(m_name);
         ret = 0;
     }
-    else if (state_NotOffline == m_state) {
-        m_socketMessage->onRemoveUserFromOnline(m_name);
-        m_socketMessage->onRemoveUserFromState(m_name);
-    }
+//    else if (state_NotOffline == m_state) {
+//        m_socketMessage->onRemoveUserFromOnline(m_name);
+//        m_socketMessage->onRemoveUserFromState(m_name);
+//    }
     else {
         if (state_offline == m_socketMessage->onSelectStateByName(m_name)) {
             // user change online or hiding

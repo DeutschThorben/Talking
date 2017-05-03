@@ -3,7 +3,8 @@
 
 RegistUser::RegistUser(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::RegistUser)
+    ui(new Ui::RegistUser),
+    m_result(0)
 {
     ui->setupUi(this);
     m_socket = new QTcpSocket();
@@ -218,6 +219,7 @@ void RegistUser::onLabelNameResult(int result)
 {
     qDebug("[%s] The result is [%d] (has name-2/not find-3)", __PRETTY_FUNCTION__, result);
     if (result_HasName == result) {
+        m_result = 1;
         ui->label_name->setText("This name has been used");
         QPixmap img(":/new/prefix1/picture/offline.png");
         QPixmap fitPixmap = img.scaled(ui->icon_name->width(), ui->icon_name->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -225,6 +227,7 @@ void RegistUser::onLabelNameResult(int result)
         ui->btn_ok->setEnabled(false);
     }
     else if (result_NotFindName == result) {
+        m_result = 0;
         ui->label_name->setText("");
         QPixmap img(":/new/prefix1/picture/online.png");
         QPixmap fitPixmap = img.scaled(ui->icon_name->width(), ui->icon_name->height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
